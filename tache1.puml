@@ -1,88 +1,88 @@
 @startuml
 entity "Client" as Client {
-  *id_client : int <<PK>>
-  courriel : string {unique}
-  telephone : string
-  mot_de_passe : string {>5 char alpha-numérique}
-  adresse_id : int <<FK>>
+  *id_client : NUMBER(38) <<PK>>
+  courriel : VARCHAR(255) {unique}
+  telephone : VARCHAR(255)
+  mot_de_passe : VARCHAR(255) {>5 char alpha-numérique}
+  adresse_id : NUMBER(38) <<FK>>
 }
 
 entity "Adresse" as Adresse {
-  *id_adresse : int <<PK>>
-  adresse : string
-  ville : string
-  province : string
-  code_postal : string
+  *id_adresse : NUMBER(38) <<PK>>
+  adresse : VARCHAR(255)
+  ville : VARCHAR(255)
+  province : VARCHAR(255)
+  code_postal : VARCHAR(255)
 }
 
 entity "CarteDeCredit" as CarteDeCredit {
-  *id_carte : int <<PK>
-  carte : string {VISA, MasterCard, Amex}
-  numero : string
-  cvv : string
-  dateExpiration : Date
-  client_id : int <<FK>>
+  *id_carte : NUMBER(38) <<PK>
+  carte : VARCHAR(255) {VISA, MasterCard, Amex}
+  numero : VARCHAR(255)
+  cvv : VARCHAR(255)
+  dateExpiration : DATE
+  client_id : NUMBER(38) <<FK>>
 }
 
 entity "Abonnement" as Abonnement {
   *code : char <<PK>>
-  forfait : string
+  forfait : VARCHAR(255)
   cout : float
-  location_max_copies : int
-  duree_max_jours : int {nullable}
+  location_max_copies : NUMBER(38)
+  duree_max_jours : NUMBER(38) {nullable}
 }
 
 entity "Film" as Film {
-  *id_film : int <<PK>>
-  titre : string
-  anneeDeSortie : int
-  langue_originale : string
-  duree_en_minutes : int
-  resume_scenario : string
-  affiche : string
-  genre_id : int <<FK>>
+  *id_film : NUMBER(38) <<PK>>
+  titre : VARCHAR(255)
+  anneeDeSortie : NUMBER(38)
+  langue_originale : VARCHAR(255)
+  duree_en_minutes : NUMBER(38)
+  resume_scenario : VARCHAR(255)
+  affiche : VARCHAR(255)
+  genre_id : NUMBER(38) <<FK>>
 }
 
 entity "Genre" as Genre {
-  *id_genre : int <<PK>>
-  nom : string
+  *id_genre : NUMBER(38) <<PK>>
+  nom : VARCHAR(255)
 }
 
 entity "Personne" as Personne {
-  *id_personne : int <<PK>>
-  nom : string
-  prenom : string
-  date_de_naissance : Date
+  *id_personne : NUMBER(38) <<PK>>
+  nom : VARCHAR(255)
+  prenom : VARCHAR(255)
+  date_de_naissance : DATE
 }
 
 entity "Acteur" as Acteur {
-  personne_id : int <<FK>>
+  personne_id : NUMBER(38) <<FK>>
 }
 
 entity "Role" as Role {
-  *id_role : int <<PK>>
-  personnage : string
-  acteur_id : int <<FK>>
-  film_id : int <<FK>>
+  *id_role : NUMBER(38) <<PK>>
+  personnage : VARCHAR(255)
+  acteur_id : NUMBER(38) <<FK>>
+  film_id : NUMBER(38) <<FK>>
 }
 
 entity "Réalisateur" as Réalisateur {
-  personne_id : int <<FK>>
-  film_id : int <<FK>>
+  personne_id : NUMBER(38) <<FK>>
+  film_id : NUMBER(38) <<FK>>
 }
 
 entity "CopieFilm" as CopieFilm {
-  *numero_de_code : string <<PK>>
-  est_retourner : bool
-  film_id : int <<FK>>
+  *numero_de_code : VARCHAR(255) <<PK>>
+  est_retourner : BIT(1) 
+  film_id : NUMBER(38) <<FK>>
 }
 
 entity "Location" as Location {
-  *id_location : int <<PK>>
-  date_de_location : Date
-  date_de_retour_prevue : Date
-  client_id : int <<FK>>
-  copieFilm_numero_de_code : string <<FK>>
+  *id_location : NUMBER(38) <<PK>>
+  date_de_location : DATE
+  date_de_retour_prevue : DATE
+  client_id : NUMBER(38) <<FK>>
+  copieFilm_numero_de_code : VARCHAR(255) <<FK>>
 }
 
 Adresse ||--o{ Client
