@@ -1,107 +1,99 @@
 @startuml
-class Personne {
-  + prenom : String
-  + nom : String
-  + dateNaissance : String
-  + lieuNaissance : String
-  + photo : String
-  + biographie : String
+entity "Client" as Client {
+  *id_client : int <<PK>>
+  courriel : string {unique}
+  telephone : string
+  mot_de_passe : string {>5 char alpha-numérique}
+  adresse_id : int <<FK>>
 }
 
-class Dossier {
-  + prenom : String
-  + nom : String
-  + courriel : String
-  + telephone : String
-  + dateNaissance : String
-  + motDePasse : String
-  + adresse : Adresse
+entity "Adresse" as Adresse {
+  *id_adresse : int <<PK>>
+  adresse : string
+  ville : string
+  province : string
+  code_postal : string
 }
 
-class Client extends Dossier {
-  + carteCredit : CarteCredit
-  + abonnement : Abonnement
+entity "CarteDeCredit" as CarteDeCredit {
+  *id_carte : int <<PK>>
+  carte : string {VISA, MasterCard, Amex}
+  numero : string
+  cvv : string
+  dateExpiration : Date
+  client_id : int <<FK>>
 }
 
-class Employe extends Dossier {
-  + matricule : String
+entity "Abonnement" as Abonnement {
+  *code : char <<PK>>
+  forfait : string
+  cout : float
+  location_max_copies : int
+  duree_max_jours : int {nullable}
 }
 
-class Acteur extends Personne {
-  + personnage : Personnage
+entity "Film" as Film {
+  *id_film : int <<PK>>
+  titre : string
+  anneeDeSortie : int
+  langue_originale : string
+  duree_en_minutes : int
+  resume_scenario : string
+  affiche : string
+  genre_id : int <<FK>>
 }
 
-class Personnage {
-  + nom : String
+entity "Genre" as Genre {
+  *id_genre : int <<PK>>
+  nom : string
 }
 
-class Realisateur extends Personne {
+entity "Personne" as Personne {
+  *id_personne : int <<PK>>
+  nom : string
+  prenom : string
+  date_de_naissance : Date
 }
 
-class Scenariste extends Personne {
+entity "Acteur" as Acteur {
+  personne_id : int <<FK>>
 }
 
-class Film {
-  + titre : String
-  + annee : Int
-  + paysProduction : PaysDeProduction[]
-  + langue : String
-  + duree : Int
-  + genres : String[]
-  + resume : String
-  + affiche : String
-  + bandeAnnonces : String[]
+entity "Role" as Role {
+  *id_role : int <<PK>>
+  personnage : string
+  acteur_id : int <<FK>>
+  film_id : int <<FK>>
 }
 
-Personnage "1" -- "*" Acteur : a >
-Film "1..*" -- "*" Personnage : joue >
-Film "1" -- "*" Realisateur : realise >
-Film "1..*" -- "*" Scenariste : ecrit >
-Film "1..*" -- "*" PaysDeProduction : a pour origine >
-
-class PaysDeProduction {
-  + nom : String
+entity "Réalisateur" as Réalisateur {
+  personne_id : int <<FK>>
+  film_id : int <<FK>>
 }
 
-class Adresse {
-  + numeroCivique : Int
-  + rue : String
-  + ville : String
-  + province : String
-  + codePostal : String
+entity "CopieFilm" as CopieFilm {
+  *numero_de_code : string <<PK>>
+  est_retourner : bool
+  film_id : int <<FK>>
 }
 
-class CarteCredit {
-  + type : String
-  + numero : String
-  + dateExpiration : Date
-  + CVV : String
+entity "Location" as Location {
+  *id_location : int <<PK>>
+  date_de_location : Date
+  date_de_retour_prevue : Date
+  client_id : int <<FK>>
+  copieFilm_numero_de_code : string <<FK>>
 }
 
-class Abonnement {
-  + nom : String
-  + coutMensuel : Double
-  + locationsMax : Int
-  + dureeMax : Int
-  + code : Char
-}
-
-class Inventaire {
-  + film : Film
-  + copiesFilm : CopieFilm[]
-  + numCopies : Int
-}
-
-class CopieFilm {
-  + numCode : String
-}
-
-Dossier "1" -- "1" Adresse : a >
-Client "1" -- "1" CarteCredit : possede >
-Client "1" -- "0..*" Abonnement : souscrit >
-CopieFilm "0..*" -- "1" Inventaire : est stocke dans >
-Inventaire "1" -- "1" Film : contient >
-
-Client "1" -- "0..*" Location : loue >
-Location "1" -- "1" CopieFilm : comprend >
+Adresse ||--o{ Client
+Client ||--o{ CarteDeCredit
+Client ||--o{ Location
+Film ||--o{ Role
+Film ||--o{ Réalisateur
+Film ||--o{ CopieFilm
+Personne ||--o{ Acteur
+Personne ||--o{ Réalisateur
+Genre ||--o{ Film
+CopieFilm ||--o{ Location
+Acteur ||--o{ Role
 @enduml
