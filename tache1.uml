@@ -1,0 +1,107 @@
+@startuml
+class Personne {
+  + prenom : String
+  + nom : String
+  + dateNaissance : String
+  + lieuNaissance : String
+  + photo : String
+  + biographie : String
+}
+
+class Dossier {
+  + prenom : String
+  + nom : String
+  + courriel : String
+  + telephone : String
+  + dateNaissance : String
+  + motDePasse : String
+  + adresse : Adresse
+}
+
+class Client extends Dossier {
+  + carteCredit : CarteCredit
+  + abonnement : Abonnement
+}
+
+class Employe extends Dossier {
+  + matricule : String
+}
+
+class Acteur extends Personne {
+  + personnage : Personnage
+}
+
+class Personnage {
+  + nom : String
+}
+
+class Realisateur extends Personne {
+}
+
+class Scenariste extends Personne {
+}
+
+class Film {
+  + titre : String
+  + annee : Int
+  + paysProduction : PaysDeProduction[]
+  + langue : String
+  + duree : Int
+  + genres : String[]
+  + resume : String
+  + affiche : String
+  + bandeAnnonces : String[]
+}
+
+Personnage "1" -- "*" Acteur : a >
+Film "1..*" -- "*" Personnage : joue >
+Film "1" -- "*" Realisateur : realise >
+Film "1..*" -- "*" Scenariste : ecrit >
+Film "1..*" -- "*" PaysDeProduction : a pour origine >
+
+class PaysDeProduction {
+  + nom : String
+}
+
+class Adresse {
+  + numeroCivique : Int
+  + rue : String
+  + ville : String
+  + province : String
+  + codePostal : String
+}
+
+class CarteCredit {
+  + type : String
+  + numero : String
+  + dateExpiration : Date
+  + CVV : String
+}
+
+class Abonnement {
+  + nom : String
+  + coutMensuel : Double
+  + locationsMax : Int
+  + dureeMax : Int
+  + code : Char
+}
+
+class Inventaire {
+  + film : Film
+  + copiesFilm : CopieFilm[]
+  + numCopies : Int
+}
+
+class CopieFilm {
+  + numCode : String
+}
+
+Dossier "1" -- "1" Adresse : a >
+Client "1" -- "1" CarteCredit : possede >
+Client "1" -- "0..*" Abonnement : souscrit >
+CopieFilm "0..*" -- "1" Inventaire : est stocke dans >
+Inventaire "1" -- "1" Film : contient >
+
+Client "1" -- "0..*" Location : loue >
+Location "1" -- "1" CopieFilm : comprend >
+@enduml
