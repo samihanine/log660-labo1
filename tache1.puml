@@ -16,7 +16,7 @@ entity "Adresse" as Adresse {
 }
 
 entity "CarteDeCredit" as CarteDeCredit {
-  *id_carte : int <<PK>>
+  *id_carte : int <<PK>
   carte : string {VISA, MasterCard, Amex}
   numero : string
   cvv : string
