@@ -1,88 +1,117 @@
 @startuml
 entity "Client" as Client {
-  *id_client : NUMBER(38) <<PK>>
-  courriel : VARCHAR(255) {unique}
+  *id_client : NUMBER(38) (PK)
+  courriel : VARCHAR(255) (U)
   telephone : VARCHAR(255)
-  mot_de_passe : VARCHAR(255) {>5 char alpha-numérique}
-  adresse_id : NUMBER(38) <<FK>>
+  mot_de_passe : VARCHAR(255)
+  adresse : VARCHAR(255)
+  ville : VARCHAR(255)
+  province : VARCHAR(255)
+  code_postal : VARCHAR(255)
+  carte : {VARCHAR(15) CHECK value IN ('VISA','MasterCard','Amex')}
+  numero : VARCHAR(255)
+  cvv : VARCHAR(255)
+  dateExpiration : DATE
 }
 
-entity "Adresse" as Adresse {
-  *id_adresse : NUMBER(38) <<PK>>
+entity "Employee" as Employee {
+  *id_employee : NUMBER(38) (PK)
+  courriel : VARCHAR(255) (U)
+  telephone : VARCHAR(255)
+  mot_de_passe : VARCHAR(255)
   adresse : VARCHAR(255)
   ville : VARCHAR(255)
   province : VARCHAR(255)
   code_postal : VARCHAR(255)
 }
 
-entity "CarteDeCredit" as CarteDeCredit {
-  *id_carte : NUMBER(38) <<PK>
-  carte : VARCHAR(255) {VISA, MasterCard, Amex}
-  numero : VARCHAR(255)
-  cvv : VARCHAR(255)
-  dateExpiration : DATE
-  client_id : NUMBER(38) <<FK>>
-}
-
 entity "Abonnement" as Abonnement {
-  *code : char <<PK>>
+  *code : char (PK)
   forfait : VARCHAR(255)
-  cout : float
+  cout : FLOAT
   location_max_copies : NUMBER(38)
-  duree_max_jours : NUMBER(38) {nullable}
+  duree_max_jours : NUMBER(38) (NN)
 }
 
 entity "Film" as Film {
-  *id_film : NUMBER(38) <<PK>>
+  *id_film : NUMBER(38) (PK)
   titre : VARCHAR(255)
   anneeDeSortie : NUMBER(38)
   langue_originale : VARCHAR(255)
   duree_en_minutes : NUMBER(38)
   resume_scenario : VARCHAR(255)
   affiche : VARCHAR(255)
-  genre_id : NUMBER(38) <<FK>>
+  realisateur_id : NUMBER(38) (FK,NN)
 }
 
-entity "Genre" as Genre {
-  *id_genre : NUMBER(38) <<PK>>
+entity "FilmScenariste" as FilmScenariste {
+  nom : VARCHAR(255)
+  film_id : NUMBER(38) (FK,NN)
+  scenariste_id : NUMBER(38) (FK,NN)
+}
+
+entity "Scenariste" as Scenariste {
   nom : VARCHAR(255)
 }
 
-entity "Personne" as Personne {
-  *id_personne : NUMBER(38) <<PK>>
+entity "FilmGenre" as FilmGenre {
+  film_id : NUMBER(38) (FK,NN)
+  genre_id : NUMBER(38) (FK,NN)
+}
+
+entity "Genre" as Genre {
+  *id_genre : NUMBER(38) (PK)
+  nom : VARCHAR(255)
+}
+
+entity "Acteur" as Acteur {
   nom : VARCHAR(255)
   prenom : VARCHAR(255)
   date_de_naissance : DATE
 }
 
-entity "Acteur" as Acteur {
-  personne_id : NUMBER(38) <<FK>>
+entity "FilmPaysDeProduction" as FilmPaysDeProduction {
+  id_film : NUMBER(38) (FK,NN)
+  paysDeProduction_id : NUMBER(38) (FK,NN)
+}
+
+entity "PaysDeProduction" as PaysDeProduction {
+  *id_pays : NUMBER(38) (PK)
+  nom : VARCHAR(255)
 }
 
 entity "Role" as Role {
-  *id_role : NUMBER(38) <<PK>>
+  *id_role : NUMBER(38) (PK)
   personnage : VARCHAR(255)
-  acteur_id : NUMBER(38) <<FK>>
-  film_id : NUMBER(38) <<FK>>
+  acteur_id : NUMBER(38) (FK,NN)
+  film_id : NUMBER(38) (FK,NN)
 }
 
 entity "Réalisateur" as Réalisateur {
-  personne_id : NUMBER(38) <<FK>>
-  film_id : NUMBER(38) <<FK>>
+  id_realisateur : NUMBER(38) (PK)
+  nom : VARCHAR(255)
+  prenom : VARCHAR(255)
+  date_de_naissance : DATE
 }
 
 entity "CopieFilm" as CopieFilm {
-  *numero_de_code : VARCHAR(255) <<PK>>
+  *numero_de_code : VARCHAR(255) (PK)
   est_retourner : BIT(1) 
-  film_id : NUMBER(38) <<FK>>
+  film_id : NUMBER(38) (FK,NN)
 }
 
 entity "Location" as Location {
-  *id_location : NUMBER(38) <<PK>>
+  *id_location : NUMBER(38) (PK)
   date_de_location : DATE
   date_de_retour_prevue : DATE
-  client_id : NUMBER(38) <<FK>>
-  copieFilm_numero_de_code : VARCHAR(255) <<FK>>
+  client_id : NUMBER(38) (FK,NN)
+  copieFilm_numero_de_code : VARCHAR(255) (FK,NN)
+}
+
+entity "LienVersLaBandeAnnonce" as LienVersLaBandeAnnonce {
+  *id_lien : NUMBER(38) (PK)
+  lien : VARCHAR(255)
+  film_id : NUMBER(38) (FK,NN)
 }
 
 Adresse ||--o{ Client
@@ -91,9 +120,15 @@ Client ||--o{ Location
 Film ||--o{ Role
 Film ||--o{ Réalisateur
 Film ||--o{ CopieFilm
-Personne ||--o{ Acteur
-Personne ||--o{ Réalisateur
 Genre ||--o{ Film
 CopieFilm ||--o{ Location
 Acteur ||--o{ Role
+PaysDeProduction ||--o{ Film
+Film ||--o{ LienVersLaBandeAnnonce
+Film ||--o{ FilmScenariste
+Scenariste ||--o{ FilmScenariste
+Film ||--o{ FilmGenre
+Genre ||--o{ FilmGenre
+Film ||--o{ FilmPaysDeProduction
+PaysDeProduction ||--o{ FilmPaysDeProduction
 @enduml
