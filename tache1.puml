@@ -45,7 +45,6 @@ object "Film" as Film {
 }
 
 object "FilmScenariste" as FilmScenariste {
-  nom : VARCHAR(255)
   film_id : NUMBER(38) (FK,NN)
   scenariste_id : NUMBER(38) (FK,NN)
 }
@@ -120,7 +119,6 @@ Film ||--o{ Réalisateur
 Film ||--o{ CopieFilm
 CopieFilm ||--o{ Location
 Acteur ||--o{ Role
-PaysDeProduction ||--o{ Film
 Film ||--o{ LienVersLaBandeAnnonce
 Film ||--o{ FilmScenariste
 Scenariste ||--o{ FilmScenariste
@@ -128,4 +126,5 @@ Genre ||--o{ FilmGenre
 Film ||--o{ FilmPaysDeProduction
 PaysDeProduction ||--o{ FilmPaysDeProduction
 Abonnement ||--o{ Client
+Film ||--o{ FilmGenre
 @enduml
