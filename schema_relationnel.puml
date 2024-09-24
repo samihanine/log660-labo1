@@ -1,28 +1,28 @@
 @startuml
 object "Client" as Client {
   *id_client : NUMBER(38) (PK)
-  courriel : VARCHAR(255) (U)
-  telephone : VARCHAR(255)
-  mot_de_passe : VARCHAR(255)
-  adresse : VARCHAR(255)
-  ville : VARCHAR(255)
-  province : VARCHAR(255)
-  code_postal : VARCHAR(255)
-  carte : {VARCHAR(15) CHECK value IN ('VISA','MasterCard','Amex')}
-  numero : VARCHAR(255)
-  cvv : VARCHAR(255)
-  dateExpiration : DATE
+  courriel : VARCHAR(255) (U) (NN)
+  telephone : VARCHAR(255) (NN)
+  mot_de_passe : VARCHAR(255) (NN)
+  adresse : VARCHAR(255) (NN)
+  ville : VARCHAR(255) (NN)
+  province : VARCHAR(255) (NN)
+  code_postal : VARCHAR(255) (NN)
+  carte : {VARCHAR(15) CHECK value IN ('VISA','MasterCard','Amex')} (NN)
+  numero : VARCHAR(255) (NN)
+  cvv : VARCHAR(255) (NN)
+  dateExpiration : DATE (NN)
 }
 
 object "Employee" as Employee {
   *id_employee : NUMBER(38) (PK)
   courriel : VARCHAR(255) (U)
-  telephone : VARCHAR(255)
-  mot_de_passe : VARCHAR(255)
-  adresse : VARCHAR(255)
-  ville : VARCHAR(255)
-  province : VARCHAR(255)
-  code_postal : VARCHAR(255)
+  telephone : VARCHAR(255) (NN)
+  mot_de_passe : VARCHAR(255) (NN)
+  adresse : VARCHAR(255) (NN)
+  ville : VARCHAR(255) (NN)
+  province : VARCHAR(255) (NN)
+  code_postal : VARCHAR(255) (NN)
 }
 
 object "Abonnement" as Abonnement {
@@ -35,11 +35,11 @@ object "Abonnement" as Abonnement {
 
 object "Film" as Film {
   *id_film : NUMBER(38) (PK)
-  titre : VARCHAR(255)
-  anneeDeSortie : NUMBER(38)
+  titre : VARCHAR(255) (NN)
+  annee_de_sortie : NUMBER(38)
   langue_originale : VARCHAR(255)
   duree_en_minutes : NUMBER(38)
-  resume_scenario : VARCHAR(255)
+  resume_scenario : VARCHAR(255) (NN)
   affiche : VARCHAR(255)
   realisateur_id : NUMBER(38) (FK,NN)
 }

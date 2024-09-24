@@ -1,27 +1,27 @@
 CREATE TABLE Client (
   id_client NUMBER(38) PRIMARY KEY,
-  courriel VARCHAR(255) UNIQUE,
-  telephone VARCHAR(255),
-  mot_de_passe VARCHAR(255),
-  adresse VARCHAR(255),
-  ville VARCHAR(255),
-  province VARCHAR(255),
-  code_postal VARCHAR(255),
-  carte VARCHAR(15) CHECK (carte IN ('VISA', 'MasterCard', 'Amex')),
-  numero VARCHAR(255),
-  cvv VARCHAR(255),
-  dateExpiration DATE
+  courriel VARCHAR(255) NOT NULL UNIQUE,
+  telephone VARCHAR(255) NOT NULL,
+  mot_de_passe VARCHAR(255) NOT NULL,
+  adresse VARCHAR(255) NOT NULL,
+  ville VARCHAR(255) NOT NULL,
+  province VARCHAR(255) NOT NULL,
+  code_postal VARCHAR(255) NOT NULL,
+  carte VARCHAR(15) CHECK (carte IN ('VISA', 'MasterCard', 'Amex')) NOT NULL,
+  numero VARCHAR(255) NOT NULL,
+  cvv VARCHAR(255) NOT NULL,
+  dateExpiration DATE NOT NULL
 );
 
 CREATE TABLE Employee (
   id_employee NUMBER(38) PRIMARY KEY,
-  courriel VARCHAR(255) UNIQUE,
-  telephone VARCHAR(255),
-  mot_de_passe VARCHAR(255),
-  adresse VARCHAR(255),
-  ville VARCHAR(255),
-  province VARCHAR(255),
-  code_postal VARCHAR(255)
+  courriel VARCHAR(255) UNIQUE NOT NULL,
+  telephone VARCHAR(255) NOT NULL,
+  mot_de_passe VARCHAR(255) NOT NULL,
+  adresse VARCHAR(255) NOT NULL,
+  ville VARCHAR(255) NOT NULL,
+  province VARCHAR(255) NOT NULL,
+  code_postal VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Réalisateur (
@@ -36,11 +36,11 @@ CREATE TABLE Réalisateur (
 
 CREATE TABLE Film (
   id_film NUMBER(38) PRIMARY KEY,
-  titre VARCHAR(255),
-  anneeDeSortie NUMBER(38),
+  titre VARCHAR(255) NOT NULL,
+  annee_de_sortie NUMBER(38),
   langue_originale VARCHAR(255),
   duree_en_minutes NUMBER(38),
-  resume_scenario VARCHAR(255),
+  resume_scenario VARCHAR(255) NOT NULL,
   affiche VARCHAR(255),
   realisateur_id NUMBER(38) NOT NULL REFERENCES Réalisateur(id_realisateur)
 );
