@@ -67,6 +67,9 @@ object "Acteur" as Acteur {
   nom : VARCHAR(255)
   prenom : VARCHAR(255)
   date_de_naissance : DATE
+  lieu_de_naissance : VARCHAR(255)
+  biographie : VARCHAR(255)
+  photo: VARCHAR(255)
 }
 
 object "FilmPaysDeProduction" as FilmPaysDeProduction {
@@ -91,6 +94,9 @@ object "Réalisateur" as Réalisateur {
   nom : VARCHAR(255)
   prenom : VARCHAR(255)
   date_de_naissance : DATE
+  lieu_de_naissance : VARCHAR(255)
+  biographie : VARCHAR(255)
+  photo: VARCHAR(255)
 }
 
 object "CopieFilm" as CopieFilm {
