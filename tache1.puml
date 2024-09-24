@@ -1,5 +1,5 @@
 @startuml
-entity "Client" as Client {
+object "Client" as Client {
   *id_client : NUMBER(38) (PK)
   courriel : VARCHAR(255) (U)
   telephone : VARCHAR(255)
@@ -14,7 +14,7 @@ entity "Client" as Client {
   dateExpiration : DATE
 }
 
-entity "Employee" as Employee {
+object "Employee" as Employee {
   *id_employee : NUMBER(38) (PK)
   courriel : VARCHAR(255) (U)
   telephone : VARCHAR(255)
@@ -25,7 +25,7 @@ entity "Employee" as Employee {
   code_postal : VARCHAR(255)
 }
 
-entity "Abonnement" as Abonnement {
+object "Abonnement" as Abonnement {
   *code : char (PK)
   forfait : VARCHAR(255)
   cout : FLOAT
@@ -33,7 +33,7 @@ entity "Abonnement" as Abonnement {
   duree_max_jours : NUMBER(38) (NN)
 }
 
-entity "Film" as Film {
+object "Film" as Film {
   *id_film : NUMBER(38) (PK)
   titre : VARCHAR(255)
   anneeDeSortie : NUMBER(38)
@@ -44,63 +44,63 @@ entity "Film" as Film {
   realisateur_id : NUMBER(38) (FK,NN)
 }
 
-entity "FilmScenariste" as FilmScenariste {
+object "FilmScenariste" as FilmScenariste {
   nom : VARCHAR(255)
   film_id : NUMBER(38) (FK,NN)
   scenariste_id : NUMBER(38) (FK,NN)
 }
 
-entity "Scenariste" as Scenariste {
+object "Scenariste" as Scenariste {
   nom : VARCHAR(255)
 }
 
-entity "FilmGenre" as FilmGenre {
+object "FilmGenre" as FilmGenre {
   film_id : NUMBER(38) (FK,NN)
   genre_id : NUMBER(38) (FK,NN)
 }
 
-entity "Genre" as Genre {
+object "Genre" as Genre {
   *id_genre : NUMBER(38) (PK)
   nom : VARCHAR(255)
 }
 
-entity "Acteur" as Acteur {
+object "Acteur" as Acteur {
   nom : VARCHAR(255)
   prenom : VARCHAR(255)
   date_de_naissance : DATE
 }
 
-entity "FilmPaysDeProduction" as FilmPaysDeProduction {
+object "FilmPaysDeProduction" as FilmPaysDeProduction {
   id_film : NUMBER(38) (FK,NN)
   paysDeProduction_id : NUMBER(38) (FK,NN)
 }
 
-entity "PaysDeProduction" as PaysDeProduction {
+object "PaysDeProduction" as PaysDeProduction {
   *id_pays : NUMBER(38) (PK)
   nom : VARCHAR(255)
 }
 
-entity "Role" as Role {
+object "Role" as Role {
   *id_role : NUMBER(38) (PK)
   personnage : VARCHAR(255)
   acteur_id : NUMBER(38) (FK,NN)
   film_id : NUMBER(38) (FK,NN)
 }
 
-entity "Réalisateur" as Réalisateur {
+object "Réalisateur" as Réalisateur {
   id_realisateur : NUMBER(38) (PK)
   nom : VARCHAR(255)
   prenom : VARCHAR(255)
   date_de_naissance : DATE
 }
 
-entity "CopieFilm" as CopieFilm {
+object "CopieFilm" as CopieFilm {
   *numero_de_code : VARCHAR(255) (PK)
   est_retourner : BIT(1) 
   film_id : NUMBER(38) (FK,NN)
 }
 
-entity "Location" as Location {
+object "Location" as Location {
   *id_location : NUMBER(38) (PK)
   date_de_location : DATE
   date_de_retour_prevue : DATE
@@ -108,27 +108,24 @@ entity "Location" as Location {
   copieFilm_numero_de_code : VARCHAR(255) (FK,NN)
 }
 
-entity "LienVersLaBandeAnnonce" as LienVersLaBandeAnnonce {
+object "LienVersLaBandeAnnonce" as LienVersLaBandeAnnonce {
   *id_lien : NUMBER(38) (PK)
   lien : VARCHAR(255)
   film_id : NUMBER(38) (FK,NN)
 }
 
-Adresse ||--o{ Client
-Client ||--o{ CarteDeCredit
 Client ||--o{ Location
 Film ||--o{ Role
 Film ||--o{ Réalisateur
 Film ||--o{ CopieFilm
-Genre ||--o{ Film
 CopieFilm ||--o{ Location
 Acteur ||--o{ Role
 PaysDeProduction ||--o{ Film
 Film ||--o{ LienVersLaBandeAnnonce
 Film ||--o{ FilmScenariste
 Scenariste ||--o{ FilmScenariste
-Film ||--o{ FilmGenre
 Genre ||--o{ FilmGenre
 Film ||--o{ FilmPaysDeProduction
 PaysDeProduction ||--o{ FilmPaysDeProduction
+Abonnement ||--o{ Client
 @enduml
