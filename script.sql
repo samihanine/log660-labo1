@@ -24,11 +24,32 @@ CREATE TABLE Employee (
   code_postal VARCHAR(255)
 );
 
+CREATE TABLE Réalisateur (
+  id_realisateur NUMBER(38) PRIMARY KEY,
+  nom VARCHAR(255),
+  prenom VARCHAR(255),
+  date_de_naissance DATE,
+  lieu_de_naissance VARCHAR(255),
+  biographie VARCHAR(255),
+  photo VARCHAR(255)
+);
+
+CREATE TABLE Film (
+  id_film NUMBER(38) PRIMARY KEY,
+  titre VARCHAR(255),
+  anneeDeSortie NUMBER(38),
+  langue_originale VARCHAR(255),
+  duree_en_minutes NUMBER(38),
+  resume_scenario VARCHAR(255),
+  affiche VARCHAR(255),
+  realisateur_id NUMBER(38) NOT NULL REFERENCES Réalisateur(id_realisateur)
+);
+
 CREATE TABLE Abonnement (
   code CHAR PRIMARY KEY,
   forfait VARCHAR(255),
   cout FLOAT,
-  location_max_copies NUMBER(38),
+  reservation_max_copies NUMBER(38),
   duree_max_jours NUMBER(38) NOT NULL
 );
 
@@ -82,25 +103,15 @@ CREATE TABLE FilmPaysDeProduction (
   CONSTRAINT pk_FilmPaysDeProduction PRIMARY KEY (id_film, paysDeProduction_id)
 );
 
-CREATE TABLE Réalisateur (
-  id_realisateur NUMBER(38) PRIMARY KEY,
-  nom VARCHAR(255),
-  prenom VARCHAR(255),
-  date_de_naissance DATE,
-  lieu_de_naissance VARCHAR(255),
-  biographie VARCHAR(255),
-  photo VARCHAR(255)
-);
-
 CREATE TABLE CopieFilm (
   numero_de_code VARCHAR(255) PRIMARY KEY,
-  est_retourner BIT(1),
+  est_retourner NUMBER(1),
   film_id NUMBER(38) NOT NULL REFERENCES Film(id_film)
 );
 
-CREATE TABLE Location (
-  id_location NUMBER(38) PRIMARY KEY,
-  date_de_location DATE,
+CREATE TABLE Reservation (
+  id_reservation NUMBER(38) PRIMARY KEY,
+  date_de_reservation DATE,
   date_de_retour_prevue DATE,
   client_id NUMBER(38) NOT NULL REFERENCES Client(id_client),
   copieFilm_numero_de_code VARCHAR(255) NOT NULL REFERENCES CopieFilm(numero_de_code)
@@ -110,15 +121,4 @@ CREATE TABLE LienVersLaBandeAnnonce (
   id_lien NUMBER(38) PRIMARY KEY,
   lien VARCHAR(255),
   film_id NUMBER(38) NOT NULL REFERENCES Film(id_film)
-);
-
-CREATE TABLE Film (
-  id_film NUMBER(38) PRIMARY KEY,
-  titre VARCHAR(255),
-  anneeDeSortie NUMBER(38),
-  langue_originale VARCHAR(255),
-  duree_en_minutes NUMBER(38),
-  resume_scenario VARCHAR(255),
-  affiche VARCHAR(255),
-  realisateur_id NUMBER(38) NOT NULL REFERENCES Réalisateur(id_realisateur)
 );
