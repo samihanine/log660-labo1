@@ -1,27 +1,27 @@
 CREATE TABLE Client (
   id_client NUMBER(38) PRIMARY KEY,
   courriel VARCHAR(255) NOT NULL UNIQUE,
-  telephone VARCHAR(255) NOT NULL,
+  telephone VARCHAR(15) NOT NULL,
   mot_de_passe VARCHAR(255) NOT NULL,
   adresse VARCHAR(255) NOT NULL,
-  ville VARCHAR(255) NOT NULL,
-  province VARCHAR(255) NOT NULL,
-  code_postal VARCHAR(255) NOT NULL,
-  carte VARCHAR(15) CHECK (carte IN ('VISA', 'MasterCard', 'Amex')) NOT NULL,
-  numero VARCHAR(255) NOT NULL,
-  cvv VARCHAR(255) NOT NULL,
+  ville VARCHAR(64) NOT NULL,
+  province VARCHAR(32) NOT NULL,
+  code_postal VARCHAR(6) NOT NULL,
+  carte VARCHAR(10) CHECK (carte IN ('VISA', 'MasterCard', 'Amex')) NOT NULL,
+  numero VARCHAR(16) NOT NULL,
+  cvv VARCHAR(3),
   dateExpiration DATE NOT NULL
 );
 
 CREATE TABLE Employee (
   id_employee NUMBER(38) PRIMARY KEY,
-  courriel VARCHAR(255) UNIQUE NOT NULL,
-  telephone VARCHAR(255) NOT NULL,
+  courriel VARCHAR(64) UNIQUE NOT NULL,
+  telephone VARCHAR(15) NOT NULL,
   mot_de_passe VARCHAR(255) NOT NULL,
   adresse VARCHAR(255) NOT NULL,
-  ville VARCHAR(255) NOT NULL,
-  province VARCHAR(255) NOT NULL,
-  code_postal VARCHAR(255) NOT NULL
+  ville VARCHAR(64) NOT NULL,
+  province VARCHAR(32) NOT NULL,
+  code_postal VARCHAR(6) NOT NULL
 );
 
 CREATE TABLE Réalisateur (

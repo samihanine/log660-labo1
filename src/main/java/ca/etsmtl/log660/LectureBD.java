@@ -5,15 +5,27 @@ import java.io.IOException;
 
 import java.io.InputStream;
 
-import java.sql.DriverManager;
+import java.sql.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class LectureBD {   
+
+
+public class LectureBD {
+   private Connection connection = null;
+   private int clientSize = 0;
+   private int personneSize = 0;
+   private int filmSize = 0;
+
+   private PreparedStatement clientPreparedStatement = null;
+
    public class Role {
       public Role(int i, String n, String p) {
          id = i;
@@ -30,7 +42,7 @@ public class LectureBD {
    }
    
    
-   public void lecturePersonnes(String nomFichier){      
+   public void lecturePersonnes(String nomFichier){
       try {
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
@@ -100,10 +112,12 @@ public class LectureBD {
        catch (IOException e) {
          System.out.println("IOException while parsing " + nomFichier); 
        }
+      System.out.println("Personne Size: "+ personneSize);
    }   
    
    public void lectureFilms(String nomFichier){
       try {
+
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
 
@@ -226,10 +240,16 @@ public class LectureBD {
       catch (IOException e) {
          System.out.println("IOException while parsing " + nomFichier); 
       }
+      System.out.println("Film Size: "+ filmSize);
    }
    
    public void lectureClients(String nomFichier){
+      String sql = "INSERT INTO CLIENT (ID_CLIENT, COURRIEL, TELEPHONE, MOT_DE_PASSE, ADRESSE, VILLE, PROVINCE, " +
+              "CODE_POSTAL, CARTE, NUMERO, CVV, DATEEXPIRATION) VALUES " +
+              "(?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+
       try {
+         clientPreparedStatement = connection.prepareStatement(sql);
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
 
@@ -335,17 +355,26 @@ public class LectureBD {
             
             eventType = parser.next();            
          }
+         clientPreparedStatement.close();
       }
       catch (XmlPullParserException e) {
           System.out.println(e);   
       }
       catch (IOException e) {
          System.out.println("IOException while parsing " + nomFichier); 
+      } catch (SQLException e){
+         throw new RuntimeException();
       }
+
    }   
    
    private void insertionPersonne(int id, String nom, String anniv, String lieu, String photo, String bio) {      
       // On insere la personne dans la BD
+
+      // Définir la requête SQL d'insertion
+
+      personneSize++;
+
    }
    
    private void insertionFilm(int id, String titre, int annee,
@@ -355,6 +384,8 @@ public class LectureBD {
                            ArrayList<Role> roles, String poster,
                            ArrayList<String> annonces) {         
       // On le film dans la BD
+      filmSize++;
+
    }
    
    private void insertionClient(int id, String nomFamille, String prenom,
@@ -363,18 +394,63 @@ public class LectureBD {
                              String codePostal, String carte, String noCarte,
                              int expMois, int expAnnee, String motDePasse,
                              String forfait) {
-      // On le client dans la BD
+
+
+
+      try{
+         LocalDate localDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
+         // Créer l'objet PreparedStatement
+
+         clientPreparedStatement.setInt(1, id);
+         clientPreparedStatement.setString(2, courriel);
+         clientPreparedStatement.setString(3, tel);
+         clientPreparedStatement.setString(4, motDePasse);
+         clientPreparedStatement.setString(5, adresse);
+         clientPreparedStatement.setString(6, ville);
+         clientPreparedStatement.setString(7, province);
+         clientPreparedStatement.setString(8, codePostal);
+         clientPreparedStatement.setString(9, carte);
+         clientPreparedStatement.setString(10, noCarte);
+         clientPreparedStatement.setString(11, "123");
+         clientPreparedStatement.setDate(12, Date.valueOf (localDate));
+         clientPreparedStatement.executeUpdate();
+      } catch (SQLException e) {
+         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
+
+         // throw new RuntimeException(e);
+      } catch (Exception e){
+         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
+      }
+
+      clientSize++;
    }
    
    private void connectionBD() {
-      // On se connecte a la BD
+      Properties props = new Properties();
+      try(InputStream input = LectureBD.class.getClassLoader().getResourceAsStream("config.properties")) {
+         Class.forName("oracle.jdbc.driver.OracleDriver");
+         props.load(input);
+         String url = props.getProperty("db.url");
+         String user = props.getProperty("db.username");
+         String password = props.getProperty("db.password");
+
+         // Établir la connexion
+         connection = DriverManager.getConnection(url, user, password);
+         System.out.println("Connexion réussie !");
+      } catch (SQLException e) {
+         System.out.println("Erreur de connexion : " + e.getMessage());
+      } catch (ClassNotFoundException e) {
+          throw new RuntimeException(e);
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
    }
 
    public static void main(String[] args) {
       LectureBD lecture = new LectureBD();
-      
       lecture.lecturePersonnes(args[0]);
       lecture.lectureFilms(args[1]);
       lecture.lectureClients(args[2]);
+
    }
 }
