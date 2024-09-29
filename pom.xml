@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ca.etsmtl</groupId>
+  <artifactId>log660</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Archetype - log660</name>
+  <url>http://maven.apache.org</url>
+
+  <repositories>
+    <repository>
+      <id>public-repo</id>
+      <url>https://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc7</artifactId>
+      <version>1.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/lib/ojdbc7.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.ogce</groupId>
+      <artifactId>xpp3</artifactId>
+      <version>1.1.3.4.C</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/lib/xpp3-1.1.3.4.C.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlpull</groupId>
+      <artifactId>xmlpull</artifactId>
+      <version>1.1.3.4.c</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/lib/xmlpull_1_1_3_4c.jar</systemPath>
+    </dependency>
+  </dependencies>
+</project>
