@@ -55,24 +55,24 @@ BEGIN
     );
 END;
 
-CREATE OR REPLACE PROCEDURE Faire_Location(
-    p_id_location INT,
-    p_date_de_location DATE,
+CREATE OR REPLACE PROCEDURE Faire_Reservation(
+    p_id_reservation INT,
+    p_date_de_reservation DATE,
     p_date_de_retour_prevue DATE,
     p_client_id INT,
     p_copieFilm_numero_de_code VARCHAR2
 )
 IS
 BEGIN
-    INSERT INTO Location (
-        id_location,
-        date_de_location,
+    INSERT INTO Reservation (
+        id_reservation,
+        date_de_reservation,
         date_de_retour_prevue,
         client_id,
         copieFilm_numero_de_code
     ) VALUES (
-        p_id_location,
-        p_date_de_location,
+        p_id_reservation,
+        p_date_de_reservation,
         p_date_de_retour_prevue,
         p_client_id,
         p_copieFilm_numero_de_code
