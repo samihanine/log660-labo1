@@ -51,7 +51,7 @@ CREATE TABLE Personne (
   prenom VARCHAR(255),
   date_de_naissance DATE,
   lieu_de_naissance VARCHAR(255),
-  biographie VARCHAR(255),
+  biographie CLOB,
   photo VARCHAR(255)
 );
 
