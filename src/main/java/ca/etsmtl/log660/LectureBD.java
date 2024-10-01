@@ -7,8 +7,10 @@ import java.io.InputStream;
 
 import java.sql.*;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -24,7 +26,7 @@ public class LectureBD {
    private int personneSize = 0;
    private int filmSize = 0;
 
-   private PreparedStatement clientPreparedStatement = null;
+   private PreparedStatement clientStatement = null;
 
    public class Role {
       public Role(int i, String n, String p) {
@@ -244,12 +246,13 @@ public class LectureBD {
    }
    
    public void lectureClients(String nomFichier){
-      String sql = "INSERT INTO CLIENT (ID_CLIENT, COURRIEL, TELEPHONE, MOT_DE_PASSE, ADRESSE, VILLE, PROVINCE, " +
-              "CODE_POSTAL, CARTE, NUMERO, CVV, DATEEXPIRATION) VALUES " +
-              "(?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+  String sql = "INSERT INTO CLIENT " +
+              "(ID_CLIENT, NOM, PRENOM, DATE_DE_NAISSANCE, COURRIEL, TELEPHONE, MOT_DE_PASSE, ADRESSE, VILLE, PROVINCE, CODE_POSTAL, CARTE, NUMERO, CVV, DATE_EXPIRATION, CODE_ABONNEMENT) " +
+              "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
+      //String sql = "{call Ajouter_Client(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)} ";
       try {
-         clientPreparedStatement = connection.prepareStatement(sql);
+         clientStatement = connection.prepareStatement(sql);
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
 
@@ -355,7 +358,7 @@ public class LectureBD {
             
             eventType = parser.next();            
          }
-         clientPreparedStatement.close();
+         clientStatement.close();
       }
       catch (XmlPullParserException e) {
           System.out.println(e);   
@@ -394,36 +397,86 @@ public class LectureBD {
                              String codePostal, String carte, String noCarte,
                              int expMois, int expAnnee, String motDePasse,
                              String forfait) {
-
-
-
       try{
-         LocalDate localDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
-         // Créer l'objet PreparedStatement
+         LocalDate expireDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
+         LocalDate annivDate = LocalDate.parse(anniv, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-         clientPreparedStatement.setInt(1, id);
-         clientPreparedStatement.setString(2, courriel);
-         clientPreparedStatement.setString(3, tel);
-         clientPreparedStatement.setString(4, motDePasse);
-         clientPreparedStatement.setString(5, adresse);
-         clientPreparedStatement.setString(6, ville);
-         clientPreparedStatement.setString(7, province);
-         clientPreparedStatement.setString(8, codePostal);
-         clientPreparedStatement.setString(9, carte);
-         clientPreparedStatement.setString(10, noCarte);
-         clientPreparedStatement.setString(11, "123");
-         clientPreparedStatement.setDate(12, Date.valueOf (localDate));
-         clientPreparedStatement.executeUpdate();
-      } catch (SQLException e) {
-         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
 
-         // throw new RuntimeException(e);
-      } catch (Exception e){
+         /*abbiv
+          p_id_client INT,p_nom VARCHAR2,p_prenom VARCHAR2,
+          p_date_de_naissance DATE,p_courriel VARCHAR2,p_telephone VARCHAR2,
+          p_mot_de_passe VARCHAR2,p_adresse VARCHAR2,p_ville VARCHAR2,
+          p_province VARCHAR2,p_code_postal VARCHAR2,p_carte VARCHAR2,
+          p_numero VARCHAR2,
+          p_cvv VARCHAR2,
+          p_date_expiration DATE,
+          p_code_abonnement VARCHAR2
+         * */
+         clientStatement.setInt(1, id);
+         clientStatement.setString(2, nomFamille);
+         clientStatement.setString(3, prenom);
+         clientStatement.setDate(4, Date.valueOf(annivDate));
+         clientStatement.setString(5, courriel);
+         clientStatement.setString(6, tel);
+         clientStatement.setString(7, motDePasse);
+         clientStatement.setString(8, adresse);
+         clientStatement.setString(9, ville);
+         clientStatement.setString(10, province);
+         clientStatement.setString(11, codePostal);
+         clientStatement.setString(12, carte);
+         clientStatement.setString(13, noCarte);
+         clientStatement.setString(14, "123");
+         clientStatement.setDate(15, Date.valueOf(expireDate));
+         clientStatement.setString(16, forfait);
+
+         clientStatement.execute();
+
+
+      } catch (SQLException | DateTimeException e) {
          System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
       }
 
       clientSize++;
    }
+
+   /*private void insertionClient(int id, String nomFamille, String prenom,
+                             String courriel, String tel, String anniv,
+                             String adresse, String ville, String province,
+                             String codePostal, String carte, String noCarte,
+                             int expMois, int expAnnee, String motDePasse,
+                             String forfait) {
+      try{
+         LocalDate expireDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
+         LocalDate annivDate = LocalDate.parse(anniv, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+         clientCallableStatement.setInt(1, id);
+         clientCallableStatement.setString(2, nomFamille);
+         clientCallableStatement.setString(3, prenom);
+         clientCallableStatement.setDate(4, Date.valueOf(annivDate));
+         clientCallableStatement.setString(5, courriel);
+         clientCallableStatement.setString(6, tel);
+         clientCallableStatement.setString(7, motDePasse);
+         clientCallableStatement.setString(8, adresse);
+         clientCallableStatement.setString(9, ville);
+         clientCallableStatement.setString(10, province);
+         clientCallableStatement.setString(11, codePostal);
+         clientCallableStatement.setString(12, carte);
+         clientCallableStatement.setString(13, noCarte);
+         clientCallableStatement.setString(14, "123");
+         clientCallableStatement.setDate(15, Date.valueOf(expireDate));
+         clientCallableStatement.setString(16, forfait);
+
+         clientCallableStatement.execute();
+
+
+      } catch (SQLException | DateTimeException e) {
+         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
+      }
+
+      clientSize++;
+   }*/
+
+
    
    private void connectionBD() {
       Properties props = new Properties();
@@ -439,9 +492,7 @@ public class LectureBD {
          System.out.println("Connexion réussie !");
       } catch (SQLException e) {
          System.out.println("Erreur de connexion : " + e.getMessage());
-      } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
-      } catch (IOException e) {
+      } catch (IOException | ClassNotFoundException e) {
           throw new RuntimeException(e);
       }
    }
