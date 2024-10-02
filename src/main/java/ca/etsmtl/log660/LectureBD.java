@@ -7,12 +7,14 @@ import java.io.InputStream;
 
 import java.sql.*;
 
+import java.sql.Date;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -25,8 +27,19 @@ public class LectureBD {
    private int clientSize = 0;
    private int personneSize = 0;
    private int filmSize = 0;
+   private int idRole = 1;
+   private Map<String, Integer> paysSaved = new HashMap<>();
+   private int paysId = 1;
 
+   private Map<String, Integer> genresSaved =  new HashMap<>();
+   private int genredId = 1;
+   private Map<String, Integer> scenaristeSaved = new HashMap<>();
+   private int scenaristeId = 1;
+
+   private int personeAdded = 0;
    private PreparedStatement clientStatement = null;
+   private PreparedStatement personneStatement = null;
+
 
    public class Role {
       public Role(int i, String n, String p) {
@@ -45,7 +58,12 @@ public class LectureBD {
    
    
    public void lecturePersonnes(String nomFichier){
+
+      String sql = "INSERT INTO PERSONNE(ID_PERSONNE, NOM, PRENOM, DATE_DE_NAISSANCE, LIEU_DE_NAISSANCE, " +
+              "BIOGRAPHIE, PHOTO) VALUES (?,?,?,?,?,?,?)";
+
       try {
+         personneStatement = connection.prepareStatement(sql);
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
 
@@ -107,13 +125,19 @@ public class LectureBD {
             
             eventType = parser.next();            
          }
+         if (personeAdded % 100 != 0){
+            personneStatement.executeBatch();
+         }
+         personneStatement.close();
       }
       catch (XmlPullParserException e) {
           System.out.println(e);   
        }
        catch (IOException e) {
          System.out.println("IOException while parsing " + nomFichier); 
-       }
+       } catch (SQLException e){
+         System.out.println("SQLException while parsing " + nomFichier);
+      }
       System.out.println("Personne Size: "+ personneSize);
    }   
    
@@ -246,13 +270,14 @@ public class LectureBD {
    }
    
    public void lectureClients(String nomFichier){
-  String sql = "INSERT INTO CLIENT " +
+      String sql = "INSERT INTO CLIENT " +
               "(ID_CLIENT, NOM, PRENOM, DATE_DE_NAISSANCE, COURRIEL, TELEPHONE, MOT_DE_PASSE, ADRESSE, VILLE, PROVINCE, CODE_POSTAL, CARTE, NUMERO, CVV, DATE_EXPIRATION, CODE_ABONNEMENT) " +
               "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
       //String sql = "{call Ajouter_Client(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)} ";
       try {
          clientStatement = connection.prepareStatement(sql);
+         //clientCallableStatement = connection.prepareCall(sql);
          XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
          XmlPullParser parser = factory.newPullParser();
 
@@ -375,6 +400,22 @@ public class LectureBD {
       // On insere la personne dans la BD
 
       // Définir la requête SQL d'insertion
+      personeAdded++;
+      try {
+         personneStatement.setInt(1,id);
+         personneStatement.setString(2,nom);
+         personneStatement.setString(3,nom);
+         personneStatement.setString(4,anniv);
+         personneStatement.setString(5,lieu);
+         personneStatement.setString(6,bio);
+         personneStatement.setString(7, photo);
+         personneStatement.addBatch();
+         if (personeAdded % 100 == 0){
+            personneStatement.executeBatch();
+         }
+      } catch (SQLException e){
+         System.out.println("Personne " + personneSize+" " + e.getMessage());
+      }
 
       personneSize++;
 
@@ -385,12 +426,335 @@ public class LectureBD {
                            ArrayList<String> genres, String realisateurNom, int realisateurId,
                            ArrayList<String> scenaristes,
                            ArrayList<Role> roles, String poster,
-                           ArrayList<String> annonces) {         
-      // On le film dans la BD
+                           ArrayList<String> annonces) {
+
+
+      System.out.println(filmSize + " / 629");
+
+      String sqlInsertFilms = "INSERT INTO FILM (ID_FILM, TITRE, ANNEE_DE_SORTIE, LANGUE_ORIGINALE, DUREE_EN_MINUTES, " +
+              "RESUME_SCENARIO, AFFICHE, REALISATEUR_ID) VALUES (?,?,?,?,?,?,?,?)";
+
+      // Films
+      try (PreparedStatement filmStatement = connection.prepareStatement(sqlInsertFilms)) {
+         filmStatement.setInt(1, id);
+         filmStatement.setString(2, titre);
+         filmStatement.setInt(3, annee);
+         filmStatement.setString(4, langue);
+         filmStatement.setInt(5, duree);
+         filmStatement.setString(6, resume);
+         filmStatement.setString(7, poster);
+         filmStatement.setInt(8, realisateurId);
+         filmStatement.executeUpdate();
+      } catch (SQLException e){
+         System.out.println("Film "  + e.getMessage());
+         return;
+      }
+
+
+      // Roles
+      String sqlInsertRole = "INSERT INTO ROLE (PERSONNAGE, ACTEUR_ID, FILM_ID) VALUES (?,?,?)";
+
+      try ( PreparedStatement extraDataStatement = connection.prepareStatement(sqlInsertRole)) {
+
+         for (Role role: roles) {
+               extraDataStatement.setString(1, role.personnage);
+               extraDataStatement.setInt(2, role.id);
+               extraDataStatement.setInt(3, id);
+               extraDataStatement.addBatch();
+         }
+         extraDataStatement.executeBatch();
+      } catch (SQLException e){
+         System.out.println("Role " + e.getMessage());
+      }
+
+      //Annonces
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO LIENVERSLABANDEANNONCE (LIEN, FILM_ID) VALUES (?, ?)");) {
+         for (String annonce: annonces) {
+            extraDataStatement.setString(1, annonce);
+            extraDataStatement.setInt(2, id);
+            extraDataStatement.addBatch();
+         }
+         if(!annonces.isEmpty()){
+            extraDataStatement.executeBatch();
+         }
+      } catch (SQLException e){
+         System.out.println("Lien Annonce " +  e.getMessage());
+      }
+
+      // Scenariste
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO SCENARISTE (ID_SCENARISTE, NOM) VALUES (?, ?)")) {
+         boolean addScenariste = false;
+         for (String scenariste: scenaristes) {
+            int idS = scenaristeSaved.getOrDefault(scenariste, 0);
+            if(idS == 0){
+               idS = scenaristeId + 1;
+               scenaristeSaved.put(scenariste, idS);
+               scenaristeId++;
+               addScenariste = true;
+               extraDataStatement.setInt(1, idS);
+               extraDataStatement.setString(2, scenariste);
+               extraDataStatement.addBatch();
+            }
+
+         }
+         if (addScenariste) {
+            extraDataStatement.executeBatch();
+         }
+      } catch (SQLException e){
+         System.out.println("scenariste " + e.getMessage());
+      }
+
+      // film scenariste
+      try ( PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO  FILMSCENARISTE (FILM_ID, SCENARISTE_ID) VALUES (?,?)");) {
+         for (String scenariste: scenaristes) {
+            extraDataStatement.setInt(1, id);
+            extraDataStatement.setInt(2, scenaristeSaved.getOrDefault(scenariste, 0));
+            extraDataStatement.addBatch();
+         }
+         extraDataStatement.executeBatch();
+      }  catch (SQLException e){
+         System.out.println("film scenariste "  + e.getMessage());
+      }
+
+
+
+      // genres
+      try (PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO GENRE (ID_GENRE, NOM) VALUES (?, ?)")) {
+         boolean addgenre = false;
+         if(id == 102798){
+            System.out.println("");
+         }
+         for (String genre: genres) {
+            int idG = genresSaved.getOrDefault(genre, 0);
+            if(idG == 0){
+               idG = genredId;
+               genresSaved.put(genre, idG);
+               genredId++;
+               addgenre = true;
+               extraDataStatement.setInt(1, idG);
+               extraDataStatement.setString(2, genre);
+               extraDataStatement.addBatch();
+            }
+         }
+         if (addgenre) {
+            extraDataStatement.executeBatch();
+         }
+      } catch (SQLException e){
+         System.out.println("genre  " + e.getMessage());
+         System.out.println();
+      }
+
+      // film genre
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO FILMGENRE (FILM_ID, GENRE_ID) VALUES  (?, ?)")) {
+         for (String genre: genres) {
+            extraDataStatement.setInt(1, id);
+            extraDataStatement.setInt(2, genresSaved.getOrDefault(genre, 0));
+            extraDataStatement.addBatch();
+         }
+         extraDataStatement.executeBatch();
+      }  catch (SQLException e){
+         System.out.println("film genre " + e.getMessage());
+      }
+
+
+
+      // pays
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO PAYSDEPRODUCTION (ID_PAYS, NOM) VALUES (?, ?)")) {
+         boolean addPays = false;
+         for (String p: pays) {
+            int idP = paysSaved.getOrDefault(p, 0);
+            if(idP == 0){
+               idP = paysId;
+               paysSaved.put(p, idP);
+               paysId++;
+               addPays = true;
+               extraDataStatement.setInt(1, idP);
+               extraDataStatement.setString(2, p);
+               extraDataStatement.addBatch();
+            }
+
+         }
+         if (addPays) {
+            extraDataStatement.executeBatch();
+         }
+      } catch (SQLException e){
+         System.out.println("Pays " + e.getMessage());
+      }
+
+      // film pays
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO FILMPAYSDEPRODUCTION (ID_FILM, PAYSDEPRODUCTION_ID) VALUES (? , ?)")) {
+         for (String p: pays) {
+            extraDataStatement.setInt(1, id);
+            extraDataStatement.setInt(2, paysSaved.getOrDefault(p, 0));
+            extraDataStatement.addBatch();
+         }
+         extraDataStatement.executeBatch();
+      }  catch (SQLException e){
+         System.out.println("film pays "  + e.getMessage());
+      }
+
+
+      try(PreparedStatement extraDataStatement = connection.prepareStatement("INSERT INTO COPIEFILM (NUMERO_DE_CODE, EST_RETOURNER, FILM_ID) VALUES (?, ?, ?)")) {
+         Random random = new Random();
+         int randomNumber = random.nextInt(10) + 1;
+         for (int i = 1; i <= randomNumber; i++) {
+            extraDataStatement.setString(1, id+"_"+i);
+            extraDataStatement.setInt(2, 0);
+            extraDataStatement.setInt(3, id);
+            extraDataStatement.addBatch();
+         }
+         extraDataStatement.executeBatch();
+      }  catch (SQLException e){
+         System.out.println("film copie  " + e.getMessage());
+      }
+
+
+
+
+      filmSize++;
+   }
+
+
+
+   /*
+
+   private void insertionFilm(int id, String titre, int annee,
+                           ArrayList<String> pays, String langue, int duree, String resume,
+                           ArrayList<String> genres, String realisateurNom, int realisateurId,
+                           ArrayList<String> scenaristes,
+                           ArrayList<Role> roles, String poster,
+                           ArrayList<String> annonces) {
+      String sqlInsertFilms = "INSERT INTO FILM (ID_FILM, TITRE, ANNEE_DE_SORTIE, LANGUE_ORIGINALE, DUREE_EN_MINUTES, " +
+              "RESUME_SCENARIO, AFFICHE, REALISATEUR_ID) VALUES (?,?,?,?,?,?,?,?)";
+
+      try (PreparedStatement filmStatement = connection.prepareStatement(sqlInsertFilms)) {
+         filmStatement.setInt(1, id);
+         filmStatement.setString(2, titre);
+         filmStatement.setInt(3, annee);
+         filmStatement.setString(4, langue);
+         filmStatement.setInt(5, duree);
+         filmStatement.setString(6, resume);
+         filmStatement.setString(7, poster);
+         filmStatement.setInt(8, realisateurId);
+         filmStatement.executeUpdate();
+      } catch (SQLException e){
+         System.out.println("Film " + filmSize+" " + e.getMessage());
+         return;
+      }
+
+      String sqlInsertRole = "INSERT INTO ROLE (PERSONNAGE, ACTEUR_ID, FILM_ID) VALUES (?,?,?)";
+      for (Role role: roles) {
+         try (PreparedStatement roleStatement = connection.prepareStatement(sqlInsertRole)) {
+            roleStatement.setString(1, role.personnage);
+            roleStatement.setInt(2, role.id);
+            roleStatement.setInt(3, id);
+            roleStatement.executeUpdate();
+         } catch (SQLException e){
+            System.out.println("Role " + e.getMessage());
+
+         }
+      }
+
+      String sqlInsertAnnonce = "INSERT INTO LIENVERSLABANDEANNONCE (LIEN, FILM_ID) VALUES (?, ?)";
+      for (String annonce: annonces) {
+         try (PreparedStatement annonceStatement = connection.prepareStatement(sqlInsertAnnonce)) {
+            annonceStatement.setString(1, annonce);
+            annonceStatement.setInt(2, id);
+            annonceStatement.executeUpdate();
+         } catch (SQLException e){
+            System.out.println("Annonce " + e.getMessage());
+         }
+      }
+
+      // insertion des scenaristes
+      String sqlInsertScenariste = "INSERT INTO SCENARISTE (ID_SCENARISTE, NOM) VALUES (?, ?)";
+      String sqlInsertFilmScenariste = "INSERT INTO FILMSCENARISTE (FILM_ID, SCENARISTE_ID) VALUES (?, ?)";
+      for (String scenariste: scenaristes) {
+         int idS = scenaristeSaved.getOrDefault(scenariste, 0);
+         if(idS == 0){
+            try (PreparedStatement scenaristeStatement = connection.prepareStatement(sqlInsertScenariste)) {
+               scenaristeStatement.setInt(1, scenaristeId);
+               scenaristeStatement.setString(2, scenariste);
+               scenaristeStatement.executeUpdate();
+               idS = scenaristeId;
+               scenaristeSaved.put(scenariste, idS);
+               scenaristeId++;
+            } catch (SQLException e){
+               System.out.println("Annonce " + e.getMessage());
+               continue;
+            }
+         }
+         try (PreparedStatement scenaristeStatement = connection.prepareStatement(sqlInsertFilmScenariste)) {
+            scenaristeStatement.setInt(2, idS);
+            scenaristeStatement.setInt(1, id);
+            scenaristeStatement.executeUpdate();
+         } catch (SQLException e){
+            System.out.println("Film scenariste Statement" + e.getMessage());
+         }
+      }
+
+      // insertion du genre
+      String sqlInsertGenre = "INSERT INTO GENRE (ID_GENRE, NOM) VALUES (?, ?)";
+      String sqlInsertFilmGenre = "INSERT INTO FILMGENRE (FILM_ID, GENRE_ID) VALUES (?,?)";
+      for (String genre: genres) {
+         int idG = genresSaved.getOrDefault(genre, 0);
+         if(idG == 0){
+            try (PreparedStatement genreStatement = connection.prepareStatement(sqlInsertGenre)) {
+               genreStatement.setInt(1, genredId);
+               genreStatement.setString(2, genre);
+               genreStatement.executeUpdate();
+               idG = genredId;
+               genresSaved.put(genre, idG);
+               genredId++;
+            } catch (SQLException e){
+               System.out.println("Genre " + e.getMessage());
+               continue;
+            }
+         }
+         try (PreparedStatement FilmGenreStatement = connection.prepareStatement(sqlInsertFilmGenre)) {
+            FilmGenreStatement.setInt(2, idG);
+            FilmGenreStatement.setInt(1, id);
+            FilmGenreStatement.executeUpdate();
+         } catch (SQLException e){
+            System.out.println("Film Genre Statement" + e.getMessage());
+         }
+      }
+
+      // insertion des pays
+      String sqlInsertPays = "INSERT INTO PAYSDEPRODUCTION (ID_PAYS, NOM) VALUES (?, ?)";
+      String sqlInsertFilmPays = "INSERT INTO FILMPAYSDEPRODUCTION (ID_FILM, PAYSDEPRODUCTION_ID) VALUES (? , ?)";
+      for (String p: pays) {
+         int idP = paysSaved.getOrDefault(p, 0);
+         if(idP == 0){
+            try (PreparedStatement paysStatement = connection.prepareStatement(sqlInsertPays)) {
+               paysStatement.setInt(1, paysId);
+               paysStatement.setString(2, p);
+               paysStatement.executeUpdate();
+               idP = paysId;
+               paysSaved.put(p, idP);
+               paysId++;
+            } catch (SQLException e){
+               System.out.println("Pays " + e.getMessage());
+               continue;
+            }
+         }
+         try (PreparedStatement filmPaysStatement = connection.prepareStatement(sqlInsertFilmPays)) {
+            filmPaysStatement.setInt(2, idP);
+            filmPaysStatement.setInt(1, id);
+            filmPaysStatement.executeUpdate();
+         } catch (SQLException e){
+            System.out.println("Film Pays Statement" + e.getMessage());
+         }
+      }
+
+
       filmSize++;
 
    }
-   
+
+   * */
+
+
    private void insertionClient(int id, String nomFamille, String prenom,
                              String courriel, String tel, String anniv,
                              String adresse, String ville, String province,
@@ -402,16 +766,6 @@ public class LectureBD {
          LocalDate annivDate = LocalDate.parse(anniv, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 
-         /*abbiv
-          p_id_client INT,p_nom VARCHAR2,p_prenom VARCHAR2,
-          p_date_de_naissance DATE,p_courriel VARCHAR2,p_telephone VARCHAR2,
-          p_mot_de_passe VARCHAR2,p_adresse VARCHAR2,p_ville VARCHAR2,
-          p_province VARCHAR2,p_code_postal VARCHAR2,p_carte VARCHAR2,
-          p_numero VARCHAR2,
-          p_cvv VARCHAR2,
-          p_date_expiration DATE,
-          p_code_abonnement VARCHAR2
-         * */
          clientStatement.setInt(1, id);
          clientStatement.setString(2, nomFamille);
          clientStatement.setString(3, prenom);
@@ -439,45 +793,6 @@ public class LectureBD {
       clientSize++;
    }
 
-   /*private void insertionClient(int id, String nomFamille, String prenom,
-                             String courriel, String tel, String anniv,
-                             String adresse, String ville, String province,
-                             String codePostal, String carte, String noCarte,
-                             int expMois, int expAnnee, String motDePasse,
-                             String forfait) {
-      try{
-         LocalDate expireDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
-         LocalDate annivDate = LocalDate.parse(anniv, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-         clientCallableStatement.setInt(1, id);
-         clientCallableStatement.setString(2, nomFamille);
-         clientCallableStatement.setString(3, prenom);
-         clientCallableStatement.setDate(4, Date.valueOf(annivDate));
-         clientCallableStatement.setString(5, courriel);
-         clientCallableStatement.setString(6, tel);
-         clientCallableStatement.setString(7, motDePasse);
-         clientCallableStatement.setString(8, adresse);
-         clientCallableStatement.setString(9, ville);
-         clientCallableStatement.setString(10, province);
-         clientCallableStatement.setString(11, codePostal);
-         clientCallableStatement.setString(12, carte);
-         clientCallableStatement.setString(13, noCarte);
-         clientCallableStatement.setString(14, "123");
-         clientCallableStatement.setDate(15, Date.valueOf(expireDate));
-         clientCallableStatement.setString(16, forfait);
-
-         clientCallableStatement.execute();
-
-
-      } catch (SQLException | DateTimeException e) {
-         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
-      }
-
-      clientSize++;
-   }*/
-
-
-   
    private void connectionBD() {
       Properties props = new Properties();
       try(InputStream input = LectureBD.class.getClassLoader().getResourceAsStream("config.properties")) {
@@ -498,10 +813,21 @@ public class LectureBD {
    }
 
    public static void main(String[] args) {
+      long startTime = System.currentTimeMillis();
       LectureBD lecture = new LectureBD();
+      System.out.println("Personnes ...");
       lecture.lecturePersonnes(args[0]);
+      System.out.println("Films ...");
       lecture.lectureFilms(args[1]);
+      System.out.println("Client ...");
       lecture.lectureClients(args[2]);
+      long endtTime = System.currentTimeMillis();
+      // 10. Convertir la durée en minutes et secondes
+      long minutes = TimeUnit.MILLISECONDS.toMinutes(endtTime - startTime);
+      long seconds = TimeUnit.MILLISECONDS.toSeconds(endtTime - startTime) - TimeUnit.MINUTES.toSeconds(minutes);
+
+      // 11. Afficher la durée en minutes et secondes
+      System.out.println("Durée d'exécution : " + minutes + " minutes et " + seconds + " secondes");
 
    }
 }
