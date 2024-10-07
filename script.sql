@@ -19,7 +19,7 @@ CREATE TABLE Client (
                         ville VARCHAR(255) NOT NULL,
                         province VARCHAR(255) NOT NULL,
                         code_postal VARCHAR(255) NOT NULL,
-                        carte VARCHAR(15) CHECK (carte IN ('VISA', 'MasterCard', 'Amex')) NOT NULL,
+                        carte VARCHAR(15) CHECK (carte IN ('Visa', 'MasterCard', 'Amex')) NOT NULL,
                         numero VARCHAR(255) NOT NULL,
                         cvv VARCHAR(255) NOT NULL,
                         date_expiration DATE NOT NULL,

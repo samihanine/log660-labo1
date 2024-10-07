@@ -5,30 +5,59 @@
   <artifactId>log660</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Archetype - log660</name>
-  <url>http://maven.apache.org</url>
+  <url>https://maven.apache.org</url>
+
+  <repositories>
+    <repository>
+      <id>hand-china-repo</id>
+      <url>https://nexus.saas.hand-china.com/content/repositories/rdc/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
 
   <dependencies>
     <dependency>
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc7</artifactId>
-      <version>1.0.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/lib/ojdbc7.jar</systemPath>
+      <version>12.1.0.2</version>
     </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.ogce/xpp3 -->
     <dependency>
       <groupId>org.ogce</groupId>
       <artifactId>xpp3</artifactId>
-      <version>1.1.3.4.C</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/lib/xpp3-1.1.3.4.C.jar</systemPath>
+      <version>1.1.6</version>
     </dependency>
+
     <dependency>
-      <groupId>org.xmlpull</groupId>
+      <groupId>xmlpull</groupId>
       <artifactId>xmlpull</artifactId>
-      <version>1.1.3.4.c</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/lib/xmlpull_1_1_3_4c.jar</systemPath>
+      <version>1.1.3.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>net.sf.kxml</groupId>
+      <artifactId>kxml2</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
