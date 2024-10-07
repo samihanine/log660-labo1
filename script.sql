@@ -64,7 +64,7 @@ CREATE TABLE Film (
                       duree_en_minutes NUMBER(38),
                       resume_scenario VARCHAR(1024) NOT NULL,
                       affiche VARCHAR(255),
-                      realisateur_id NUMBER(38) NOT NULL REFERENCES Personne(id_personne)
+                      realisateur_id NUMBER(38) REFERENCES Personne(id_personne)
 );
 
 CREATE TABLE Scenariste (
