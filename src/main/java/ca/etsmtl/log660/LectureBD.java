@@ -761,6 +761,9 @@ public class LectureBD {
                              String codePostal, String carte, String noCarte,
                              int expMois, int expAnnee, String motDePasse,
                              String forfait) {
+
+      System.out.println("No: " + clientSize);
+
       try{
          LocalDate expireDate = LocalDate.of(expAnnee, expMois, 1).plusMonths(1).minusDays(1);
          LocalDate annivDate = LocalDate.parse(anniv, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -787,7 +790,7 @@ public class LectureBD {
 
 
       } catch (SQLException | DateTimeException e) {
-         System.out.println("Clients Size: "+ clientSize + " -- "+ e.getMessage());
+         System.out.println("Clients ID: "+ id + " -- "+ e.getMessage());
       }
 
       clientSize++;
