@@ -29,53 +29,43 @@ package ca.etsmtl.log660.labo2.models;
 
 import jakarta.persistence.*;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
-@Entity
-@Table(name = "CLIENT")
-@Setter
-public class User  extends Person implements UserDetails {
-    private String password;
-    private String email;
-    private String phone;
-    private String address;
-    private String city;
-    private String state;
-    private String zip;
-    private CarteType carteType;
-    private String carteNumber;
-    private Date dateExpire;
-    private String subscribe;
 
-    @Transient
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+@Entity
+@Table(name = "PERSONNE")
+@Setter
+public class Contributor extends Person {
+
+    private String biography;
+
+    private String photo;
+
+    private String birthPlace;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID_CLIENT")
+    @Column(name = "ID_PERSONNE")
     public int getId() {
         return super.getId();
     }
-
-    @Column(name = "COURRIEL")
-    public String getEmail() {
-        return email;
+    @Column(name = "BIOGRAPHIE")
+    public String getBiography() {
+        return biography;
     }
 
-    @Column(name = "TELEPHONE")
-    public String getPhone() {
-        return phone;
+    @Column(name = "PHOTO")
+    public String getPhoto() {
+        return photo;
+    }
+
+    @Column(name = "LIEU_DE_NAISSANCE")
+    public String getBirthPlace() {
+        return birthPlace;
     }
 
     @Override
@@ -95,59 +85,4 @@ public class User  extends Person implements UserDetails {
     public Date getBirthDate() {
         return super.getBirthDate();
     }
-
-    @Column(name = "ADRESSE")
-    public String getAddress() {
-        return address;
-    }
-
-    @Column(name = "VILLE")
-    public String getCity() {
-        return city;
-    }
-
-    @Column(name = "PROVINCE")
-    public String getState() {
-        return state;
-    }
-
-    @Column(name = "CODE_POSTAL")
-    public String getZip() {
-        return zip;
-    }
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "CARTE")
-    public CarteType getCarteType() {
-        return carteType;
-    }
-
-    @Column(name = "NUMERO")
-    public String getCarteNumber() {
-        return carteNumber;
-    }
-
-    @Column(name = "DATE_EXPIRATION")
-    public Date getDateExpire() {
-        return dateExpire;
-    }
-
-    @Column(name = "CODE_ABONNEMENT")
-    public String getSubscribe() {
-        return subscribe;
-    }
-
-    @Column(name = "MOT_DE_PASSE")
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Transient
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-
 }

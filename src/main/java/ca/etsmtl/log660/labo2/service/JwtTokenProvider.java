@@ -46,7 +46,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt.secret}")
     private String secretKey;
 
-    private final long validityInMilliseconds = 3600000; // 1 hour
+    private final long validityInMilliseconds = 3_600_000_00; // 1 hour
 
     public String createToken(String username) {
         Claims claims = Jwts.claims().setSubject(username);

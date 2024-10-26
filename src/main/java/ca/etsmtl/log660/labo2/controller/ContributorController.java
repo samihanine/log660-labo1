@@ -1,4 +1,4 @@
-package ca.etsmtl.log660.labo2.service;
+package ca.etsmtl.log660.labo2.controller;
 /*
  * Copyright (c)
  * All rights reserved.
@@ -27,42 +27,29 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import ca.etsmtl.log660.labo2.models.Contributor;
+import ca.etsmtl.log660.labo2.service.contributor.ContributorService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
+@RestController
+@RequestMapping("/contributors")
+public class ContributorController {
 
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
+    private final ContributorService baseDataService;
 
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public ContributorController(ContributorService baseDataService) {
+        this.baseDataService = baseDataService;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @GetMapping("/{id}")
+    public Contributor getContributorById(@PathVariable int id) {
+        return baseDataService.getContributorById(id);
     }
 }

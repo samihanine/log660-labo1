@@ -28,15 +28,16 @@ package ca.etsmtl.log660.labo2.controller;
  */
 
 import ca.etsmtl.log660.labo2.controller.dto.AuthenticationRequest;
+import ca.etsmtl.log660.labo2.controller.dto.UserDto;
+import ca.etsmtl.log660.labo2.models.User;
 import ca.etsmtl.log660.labo2.service.JwtTokenProvider;
+import ca.etsmtl.log660.labo2.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,10 +52,12 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
-    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserService userService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -66,6 +69,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
             result.put("token", jwtTokenProvider.createToken(authentication.getName()));
+            result.put("type", "Bearer");
 
             return result;
 
@@ -74,6 +78,26 @@ public class AuthController {
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid login credentials");
         }
+
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(Authentication authentication) {
+        String username = authentication.getName();
+
+        User user = userService.findByEmail(username);
+
+        return ResponseEntity.ok(UserDto.builder()
+                        .city(user.getCity())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .address(user.getAddress())
+                        .state(user.getState())
+                        .zip(user.getZip())
+                        .name(user.getName())
+                        .firstName(user.getFirstName())
+                        .birthDate(user.getBirthDate())
+                .build());
 
     }
 }

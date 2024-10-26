@@ -1,4 +1,4 @@
-package ca.etsmtl.log660.labo2.service;
+package ca.etsmtl.log660.labo2.models;
 /*
  * Copyright (c)
  * All rights reserved.
@@ -27,42 +27,36 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
+@Entity
+@Table(name = "SCENARISTE")
+@Setter
+public class Scriptwriter {
 
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
+    private int id;
 
-    private final UserRepository userRepository;
+    private String name;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    private void setId(int id) {
+        this.id = id;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID_SCENARISTE")
+    public int getId() {
+        return id;
     }
 
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Column(name = "NOM")
+    public String getName() {
+        return name;
     }
 }

@@ -27,42 +27,59 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import ca.etsmtl.log660.labo2.models.Film;
 import ca.etsmtl.log660.labo2.models.User;
+import ca.etsmtl.log660.labo2.repository.basedata.BaseDataRepository;
+import ca.etsmtl.log660.labo2.repository.film.FilmRepository;
 import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
-
 @Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
+class DefaultFilmService implements FilmService {
 
+    private final FilmRepository filmRepository;
+    private final BaseDataRepository baseDataRepository;
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+
+    DefaultFilmService(FilmRepository filmRepository, BaseDataRepository baseDataRepository, UserRepository userRepository) {
+        this.filmRepository = filmRepository;
+        this.baseDataRepository = baseDataRepository;
         this.userRepository = userRepository;
     }
 
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
+    public Film getFilmById(int id) {
+        Film film = filmRepository.getFilmById(id);
+        film.setRoles(baseDataRepository.getRolesByFilmId(id));
+        film.setGenres(baseDataRepository.getGenresByFilmId(id));
+        film.setDirector(baseDataRepository.getDirectorByFilmId(id));
+        film.setTrailers(baseDataRepository.getTrailersByFilmId(id));
+        film.setScriptwriters(baseDataRepository.getScriptwritersByFilmId(id));
+        film.setCountries(baseDataRepository.getCountriesByFilmId(id));
+        return film;
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Set<Film> getFilmsByKeyword(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear, int page, int pageSize) {
+        return filmRepository.getFilms(title, genre, actor, director, language, country, startYear, endYear, page, pageSize);
+    }
+
+    @Override
+    public void rentFilm(int id, String email) {
+        User currentUser = userRepository.findByEmail(email);
+        filmRepository.rentFilm(id, currentUser);
+    }
+
+    @Override
+    public long getCountFilm(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear) {
+        return filmRepository.getCountFilm(title, genre, actor, director, language, country, startYear, endYear);
     }
 }

@@ -1,4 +1,6 @@
 package ca.etsmtl.log660.labo2.service;
+
+
 /*
  * Copyright (c)
  * All rights reserved.
@@ -28,41 +30,10 @@ package ca.etsmtl.log660.labo2.service;
  */
 
 import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
-
-
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
-
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+public interface UserService {
+    User findByEmail(String email);
 }

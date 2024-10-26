@@ -1,4 +1,4 @@
-package ca.etsmtl.log660.labo2.service;
+package ca.etsmtl.log660.labo2.models;
 /*
  * Copyright (c)
  * All rights reserved.
@@ -27,42 +27,27 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.sql.Date;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
+@Getter
+@Setter
+public abstract class Person {
+    private int id;
+    private String name;
+    private String firstName;
+    private Date birthDate;
 
-
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
-
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    private void setId(int id) {
+        this.id = id;
     }
 }

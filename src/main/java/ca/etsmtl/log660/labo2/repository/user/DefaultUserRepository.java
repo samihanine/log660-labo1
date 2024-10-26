@@ -55,8 +55,8 @@ public class DefaultUserRepository implements UserRepository {
 
         try (Session session = getSession()) {
             return session
-                    .createQuery("from User where email = :email", User.class)
-                    .setParameter("email", email)
+                    .createQuery("from User where upper(email) = :email", User.class)
+                    .setParameter("email", email.trim().toUpperCase())
                     .uniqueResult();
         } catch (Exception e) {
             return null;

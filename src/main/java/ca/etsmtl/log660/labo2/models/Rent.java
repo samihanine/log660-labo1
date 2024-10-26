@@ -1,4 +1,4 @@
-package ca.etsmtl.log660.labo2.service;
+package ca.etsmtl.log660.labo2.models;
 /*
  * Copyright (c)
  * All rights reserved.
@@ -27,42 +27,56 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.*;
+import lombok.Setter;
+
+import java.util.Date;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
+@Entity
+@Table(name="RESERVATION")
+@Setter
+public class Rent {
 
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
+    private int id;
+    private FilmCopy filmCopy;
+    private User client;
+    private Date rentDate;
+    private Date returnDate;
 
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID_RESERVATION")
+    public int getId() {
+        return id;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
+    @ManyToOne
+    @JoinColumn(name = "COPIEFILM_NUMERO_DE_CODE")
+    public FilmCopy getFilmCopy() {
+        return filmCopy;
     }
 
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @ManyToOne
+    @JoinColumn(name = "CLIENT_ID")
+    public User getClient() {
+        return client;
+    }
+
+    @Column(name = "DATE_DE_RESERVATION")
+    public Date getRentDate() {
+        return rentDate;
+    }
+
+    @Column(name = "DATE_DE_RETOUR_PREVUE")
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    private void setId(int id) {
+        this.id = id;
     }
 }

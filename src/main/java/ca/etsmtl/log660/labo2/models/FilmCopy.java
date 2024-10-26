@@ -1,4 +1,4 @@
-package ca.etsmtl.log660.labo2.service;
+package ca.etsmtl.log660.labo2.models;
 /*
  * Copyright (c)
  * All rights reserved.
@@ -27,42 +27,42 @@ package ca.etsmtl.log660.labo2.service;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.models.User;
-import ca.etsmtl.log660.labo2.repository.user.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import jakarta.persistence.*;
+import lombok.Setter;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
+@Entity
+@Table(name="COPIEFILM")
+@Setter
+public class FilmCopy {
+    private String id;
+    private Film film;
+    private boolean available;
 
-@Service
-public class CustomUserDetailsService  implements UserDetailsService, UserService {
-
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "NUMERO_DE_CODE")
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Make sure passwords are encoded in the database
-                .authorities("USER") // You can add roles/authorities as needed
-                .build();
+    private void setId(String id) {
+        this.id = id;
     }
 
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @ManyToOne
+    @JoinColumn(name = "FILM_ID")
+    public Film getFilm() {
+        return film;
+    }
+
+
+
+    @Column(name = "EST_RETOURNER")
+    public boolean isAvailable() {
+        return available;
     }
 }
