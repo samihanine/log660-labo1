@@ -82,4 +82,10 @@ class DefaultFilmService implements FilmService {
     public long getCountFilm(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear) {
         return filmRepository.getCountFilm(title, genre, actor, director, language, country, startYear, endYear);
     }
+
+    @Override
+    public void returnFilm(String idCopy, String name) {
+        User currentUser = userRepository.findByEmail(name);
+        filmRepository.returnFilm(idCopy, currentUser);
+    }
 }

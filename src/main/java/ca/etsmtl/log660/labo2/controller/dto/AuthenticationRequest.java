@@ -27,13 +27,16 @@ package ca.etsmtl.log660.labo2.controller.dto;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 
 @Data
+@Builder
 public class AuthenticationRequest {
     private String username;
     private String password;

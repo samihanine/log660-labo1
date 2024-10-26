@@ -133,10 +133,29 @@ class DefaultFilmRepository implements FilmRepository {
 
     }
 
+    @Override
+    public void returnFilm(String idCopy, User currentUser) {
+        try(Session session = getSession()) {
+            StoredProcedureQuery query = session.createStoredProcedureQuery("RETURN_FILM");
+
+            query.registerStoredProcedureParameter("p_client_id", Integer.class, jakarta.persistence.ParameterMode.IN);
+            query.registerStoredProcedureParameter("p_copie_film_numero", String.class, jakarta.persistence.ParameterMode.IN);
+            query.registerStoredProcedureParameter("p_date", Date.class, jakarta.persistence.ParameterMode.IN);
+
+            query.setParameter("p_date", new Date(System.currentTimeMillis()));
+            query.setParameter("p_copie_film_numero", idCopy);
+            query.setParameter("p_client_id", currentUser.getId());
+
+            query.execute();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     private FilmCopy getAvailableCopy(Session session, int idFilm) {
         try  {
 
-            TypedQuery<FilmCopy> query = session.createQuery(" from FilmCopy f  where f.film.id = :id and f.available", FilmCopy.class);
+            TypedQuery<FilmCopy> query = session.createQuery(" from FilmCopy f  where f.film.id = :id and f.available order by f.id", FilmCopy.class);
 
             query.setParameter("id", idFilm);
 

@@ -45,4 +45,6 @@ public interface FilmService {
     void rentFilm(int id, String email);
 
   long getCountFilm(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear);
+
+    void returnFilm(String idCopy, String name);
 }

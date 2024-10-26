@@ -150,4 +150,25 @@ public class FilmController {
         return ResponseEntity
                 .ok(response);
     }
+
+    @PostMapping("/return/{idCopy}")
+    public ResponseEntity< Map<String, String> >returnFilm(@PathVariable String idCopy, Authentication authentication) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Film returned successfully");
+
+        try {
+            filmService.returnFilm(idCopy, authentication.getName());
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(response);
+        }
+        return ResponseEntity
+                .ok(response);
+    }
+
+
+
+
 }

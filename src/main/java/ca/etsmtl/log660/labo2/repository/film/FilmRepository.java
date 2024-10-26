@@ -47,4 +47,6 @@ public interface FilmRepository {
     Film getFilmById(int id);
 
     void rentFilm(int id, User currentUser);
+
+    void returnFilm(String idCopy, User currentUser);
 }
