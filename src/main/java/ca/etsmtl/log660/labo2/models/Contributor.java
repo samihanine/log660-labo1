@@ -39,7 +39,7 @@ import java.sql.Date;
 @Entity
 @Table(name = "PERSONNE")
 @Setter
-public class Contributor extends Person {
+public  class Contributor extends Person {
 
     private String biography;
 
@@ -48,7 +48,6 @@ public class Contributor extends Person {
     private String birthPlace;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_PERSONNE")
     public int getId() {
         return super.getId();

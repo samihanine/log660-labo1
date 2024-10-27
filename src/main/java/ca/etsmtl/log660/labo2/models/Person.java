@@ -27,7 +27,6 @@ package ca.etsmtl.log660.labo2.models;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -41,6 +40,7 @@ import java.sql.Date;
  */
 @Getter
 @Setter
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Person {
     private int id;
     private String name;
@@ -50,4 +50,5 @@ public abstract class Person {
     private void setId(int id) {
         this.id = id;
     }
+
 }

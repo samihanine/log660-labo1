@@ -43,7 +43,6 @@ public class FilmCopy {
     private boolean available;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "NUMERO_DE_CODE")
     public String getId() {
         return id;

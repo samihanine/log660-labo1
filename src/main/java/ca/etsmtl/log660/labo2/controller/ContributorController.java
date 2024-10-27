@@ -48,6 +48,7 @@ public class ContributorController {
 
     @GetMapping("/{id}")
     public Contributor getContributorById(@PathVariable int id) {
+        Contributor contributor = baseDataService.getContributorById(id);
         return baseDataService.getContributorById(id);
     }
 }

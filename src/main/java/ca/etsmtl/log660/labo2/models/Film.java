@@ -62,7 +62,6 @@ public class Film {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_FILM")
     public int getId() {
         return id;
