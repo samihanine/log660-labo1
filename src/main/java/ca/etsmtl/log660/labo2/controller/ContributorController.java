@@ -29,10 +29,7 @@ package ca.etsmtl.log660.labo2.controller;
 
 import ca.etsmtl.log660.labo2.models.Contributor;
 import ca.etsmtl.log660.labo2.service.contributor.ContributorService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
@@ -40,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/contributors")
+
 public class ContributorController {
 
     private final ContributorService baseDataService;

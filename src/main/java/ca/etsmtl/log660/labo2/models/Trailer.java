@@ -29,23 +29,40 @@ package ca.etsmtl.log660.labo2.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
  */
 @Entity
 @Table(name = "LIENVERSLABANDEANNONCE")
-@Getter
+@Setter
 public class Trailer {
+
+    private int id;
+    private String url;
+    private Film film;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_LIEN")
-    private int id;
+    public int getId() {
+        return id;
+    }
 
     @Column(name = "LIEN")
-    private String url;
+    public String getUrl() {
+        return url;
+    }
 
     @ManyToOne
     @JoinColumn(name = "FILM_ID")
-    private Film film;
+    public Film getFilm() {
+        return film;
+    }
+
+    private void setId(int id) {
+        this.id = id;
+    }
 }

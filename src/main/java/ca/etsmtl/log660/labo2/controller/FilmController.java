@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
+@CrossOrigin
 public class FilmController {
 
     private final FilmService filmService;

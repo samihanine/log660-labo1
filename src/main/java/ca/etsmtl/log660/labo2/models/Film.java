@@ -40,31 +40,60 @@ import java.util.Set;
 
 @Entity
 @Table(name = "FILM")
-@Getter
 @Setter
 public class Film {
+
+    private int id;
+    private String title;
+    private int year;
+    private String language;
+    private int duration;
+    private String poster;
+    private String resume;
+    private Set<Genre> genres = new HashSet<>();
+    private Contributor director;
+    private Set<Role> roles = new HashSet<>();
+    private Set<Scriptwriter> scriptwriters = new HashSet<>();
+    private Set<Country> countries = new HashSet<>();
+    private Set<Trailer> trailers = new HashSet<>();
+
+    private void setId(int id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_FILM")
-    private int id;
+    public int getId() {
+        return id;
+    }
 
     @Column(name = "TITRE")
-    private String title;
-
+    public String getTitle() {
+        return title;
+    }
     @Column(name = "ANNEE_DE_SORTIE")
-    private int year;
-
+    public int getYear() {
+        return year;
+    }
     @Column(name = "LANGUE_ORIGINALE")
-    private String language;
-
+    public String getLanguage() {
+        return language;
+    }
     @Column(name = "DUREE_EN_MINUTES")
-    private int duration;
+    public int getDuration() {
+        return duration;
+    }
 
     @Column(name = "AFFICHE")
-    private String poster;
+    public String getPoster() {
+        return poster;
+    }
 
     @Column(name = "RESUME_SCENARIO")
-    private String resume;
+    public String getResume() {
+        return resume;
+    }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -72,22 +101,20 @@ public class Film {
             joinColumns = @JoinColumn(name = "FILM_ID"),
             inverseJoinColumns = @JoinColumn(name = "GENRE_ID")
     )
-    private Set<Genre> genres = new HashSet<>();
+    public Set<Genre> getGenres() {
+        return genres;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REALISATEUR_ID")
-    private Contributor director;
-/*
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "ROLE",
-            joinColumns = @JoinColumn(name = "FILM_ID"),
-            inverseJoinColumns = @JoinColumn(name = "ACTEUR_ID")
-    )
-    private Set<Contributor> actors = new HashSet<>();*/
+    public Contributor getDirector() {
+        return director;
+    }
 
     @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)
-    private Set<Role> roles = new HashSet<>();
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -95,8 +122,9 @@ public class Film {
             joinColumns = @JoinColumn(name = "FILM_ID"),
             inverseJoinColumns = @JoinColumn(name = "SCENARISTE_ID")
     )
-    private Set<Scriptwriter> scriptwriters = new HashSet<>();
-
+    public Set<Scriptwriter> getScriptwriters() {
+        return scriptwriters;
+    }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -104,14 +132,12 @@ public class Film {
             joinColumns = @JoinColumn(name = "ID_FILM"),
             inverseJoinColumns = @JoinColumn(name = "PAYSDEPRODUCTION_ID")
     )
-    private Set<Country> countries = new HashSet<>();
-
-
-    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)
-    private Set<Trailer> trailers = new HashSet<>();
-
-    private void setID(int id) {
-        this.id = id;
+    public Set<Country> getCountries() {
+        return countries;
     }
 
+    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)
+    public Set<Trailer> getTrailers() {
+        return trailers;
+    }
 }

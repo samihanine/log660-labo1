@@ -30,6 +30,7 @@ package ca.etsmtl.log660.labo2.controller;
 import ca.etsmtl.log660.labo2.controller.dto.SubData;
 import ca.etsmtl.log660.labo2.service.BaseDataService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/data")
+
 public class BaseDataController {
 
     private final BaseDataService baseDataService;

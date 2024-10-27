@@ -60,7 +60,6 @@ public class FilmCopy {
     }
 
 
-
     @Column(name = "EST_RETOURNER")
     public boolean isAvailable() {
         return available;

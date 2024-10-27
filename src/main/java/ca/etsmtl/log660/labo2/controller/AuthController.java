@@ -48,6 +48,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/")
+
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;

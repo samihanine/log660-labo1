@@ -32,6 +32,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Kacou Serge BROU <kacou-serge-bruno.brou.1@ens.etsmtl.ca, brouserge1er@gmail.com>
@@ -39,11 +40,23 @@ import lombok.Getter;
 
 @Entity
 @Table(name = "GENRE")
-@Getter
+@Setter
 public class Genre {
+    private int id;
+    private String name;
+
+    private void setId(int id) {
+        this.id = id;
+    }
+
     @Id
     @Column(name = "ID_GENRE")
-    private int id;
+    public int getId() {
+        return id;
+    }
+
     @Column(name = "NOM")
-    private String name;
+    public String getName() {
+        return name;
+    }
 }
