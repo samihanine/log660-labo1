@@ -42,7 +42,6 @@ import java.util.Set;
 @Table(name = "FILM")
 @Setter
 public class Film {
-
     private int id;
     private String title;
     private int year;
