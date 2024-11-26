@@ -38,13 +38,18 @@ import java.util.Set;
  */
 public interface FilmService {
 
-  Film getFilmById(int id);
-  Set<Film> getFilmsByKeyword(String title, String genre, String actor, String director, String language,
-                              String country, int startYear, int endYear, int page, int pageSize);
+    Film getFilmById(int id);
+
+    Set<Film> getFilmsByKeyword(String title, String genre, String actor, String director, String language,
+                                String country, int startYear, int endYear, int page, int pageSize);
 
     void rentFilm(int id, String email);
 
-  long getCountFilm(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear);
+    long getCountFilm(String title, String genre, String actor, String director, String language, String country, int startYear, int endYear);
 
     void returnFilm(String idCopy, String name);
+
+    void generateFakeRents();
+
+    int numberOfRentals(Integer age, String month, String province, String weekday);
 }

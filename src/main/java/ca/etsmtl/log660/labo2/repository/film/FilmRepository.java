@@ -29,7 +29,6 @@ package ca.etsmtl.log660.labo2.repository.film;
 
 import ca.etsmtl.log660.labo2.models.Film;
 import ca.etsmtl.log660.labo2.models.User;
-import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
@@ -38,15 +37,20 @@ import java.util.Set;
  */
 
 public interface FilmRepository {
+
     Set<Film> getFilms(String title, String genre, String actor, String director, String language,
-                                String country, int startYear, int endYear, int page, int pageSize);
+                       String country, int startYear, int endYear, int page, int pageSize);
 
     Long getCountFilm(String title, String genre, String actor, String director, String language,
-                                String country, int startYear, int endYear);
+                      String country, int startYear, int endYear);
 
     Film getFilmById(int id);
 
     void rentFilm(int id, User currentUser);
 
     void returnFilm(String idCopy, User currentUser);
+
+    void generateFakeRents();
+
+    int getNumberOfRentals(Integer age, String month, String province, String weekday);
 }

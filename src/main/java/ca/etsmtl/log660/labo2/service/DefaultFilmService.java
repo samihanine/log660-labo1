@@ -88,4 +88,14 @@ class DefaultFilmService implements FilmService {
         User currentUser = userRepository.findByEmail(name);
         filmRepository.returnFilm(idCopy, currentUser);
     }
+
+    @Override
+    public void generateFakeRents() {
+        filmRepository.generateFakeRents();
+    }
+
+    @Override
+    public int numberOfRentals(Integer age, String month, String province, String weekday) {
+        return filmRepository.getNumberOfRentals(age, month, province, weekday);
+    }
 }

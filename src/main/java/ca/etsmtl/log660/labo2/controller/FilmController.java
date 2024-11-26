@@ -27,9 +27,13 @@ package ca.etsmtl.log660.labo2.controller;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ca.etsmtl.log660.labo2.controller.dto.*;
+import ca.etsmtl.log660.labo2.controller.dto.FilmDetailDto;
+import ca.etsmtl.log660.labo2.controller.dto.FilmDto;
+import ca.etsmtl.log660.labo2.controller.dto.RoleDto;
+import ca.etsmtl.log660.labo2.controller.dto.SubData;
 import ca.etsmtl.log660.labo2.models.*;
 import ca.etsmtl.log660.labo2.service.FilmService;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -49,6 +53,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class FilmController {
 
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FilmController.class);
     private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
@@ -56,18 +61,16 @@ public class FilmController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> getFilms(@RequestParam(required = false,defaultValue = "") String title,
-                                  @RequestParam(required = false ,defaultValue = "0") int startYear,
-                                  @RequestParam(required = false ,defaultValue = "9999") int endYear,
-                                  @RequestParam(required = false ,defaultValue = "") String country,
-                                  @RequestParam(required = false ,defaultValue = "") String genre,
-                                  @RequestParam(required = false ,defaultValue = "") String director,
-                                  @RequestParam(required = false ,defaultValue = "") String actor,
-                                  @RequestParam(required = false ,defaultValue = "") String language,
-                                  @RequestParam(required = false, defaultValue = "1") int page,
-                                  @RequestParam(required = false, defaultValue = "30") int pageSize) {
-
-
+    public ResponseEntity<Map<String, Object>> getFilms(@RequestParam(required = false, defaultValue = "") String title,
+                                                        @RequestParam(required = false, defaultValue = "0") int startYear,
+                                                        @RequestParam(required = false, defaultValue = "9999") int endYear,
+                                                        @RequestParam(required = false, defaultValue = "") String country,
+                                                        @RequestParam(required = false, defaultValue = "") String genre,
+                                                        @RequestParam(required = false, defaultValue = "") String director,
+                                                        @RequestParam(required = false, defaultValue = "") String actor,
+                                                        @RequestParam(required = false, defaultValue = "") String language,
+                                                        @RequestParam(required = false, defaultValue = "1") int page,
+                                                        @RequestParam(required = false, defaultValue = "30") int pageSize) {
 
 
         Set<Film> films = filmService.getFilmsByKeyword(title, genre, actor, director, language, country,
@@ -85,7 +88,7 @@ public class FilmController {
         response.put("pageSize", pageSize);
         long totalItems = filmService.getCountFilm(title, genre, actor, director, language, country, startYear, endYear);
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
-        response.put("total",totalItems);
+        response.put("total", totalItems);
         response.put("totalPages", totalPages);
 
         return ResponseEntity
@@ -129,7 +132,7 @@ public class FilmController {
     }
 
     @PostMapping("/rental/{id}")
-    public ResponseEntity< Map<String, String> >rentFilm(@PathVariable int id, Authentication authentication) {
+    public ResponseEntity<Map<String, String>> rentFilm(@PathVariable int id, Authentication authentication) {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Film rented successfully");
 
@@ -137,11 +140,11 @@ public class FilmController {
             filmService.rentFilm(id, authentication.getName());
         } catch (Exception e) {
             response.put("code", e.getMessage());
-            if(e.getMessage().equals("CHECK_MAX_RESERVATIONS")) {
+            if (e.getMessage().equals("CHECK_MAX_RESERVATIONS")) {
                 response.put("message", "You have reached the maximum number of rentals");
             }
 
-            if(e.getMessage().equals("NO_AVAILABLE_COPY")){
+            if (e.getMessage().equals("NO_AVAILABLE_COPY")) {
                 response.put("message", "Film not available for rent");
             }
             return ResponseEntity
@@ -153,7 +156,7 @@ public class FilmController {
     }
 
     @PostMapping("/return/{idCopy}")
-    public ResponseEntity< Map<String, String> >returnFilm(@PathVariable String idCopy, Authentication authentication) {
+    public ResponseEntity<Map<String, String>> returnFilm(@PathVariable String idCopy, Authentication authentication) {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Film returned successfully");
 
@@ -169,7 +172,39 @@ public class FilmController {
                 .ok(response);
     }
 
+    @PostMapping("/generate-fake-rentals")
+    public ResponseEntity<Map<String, String>> generateFakeRentals() {
+        logger.info("Starting the generation of fake rentals.");
+        Map<String, String> response = new HashMap<>();
+        try {
+            filmService.generateFakeRents();
+            response.put("message", "Fake rentals generated successfully.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "Error generating fake rentals.");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
+    @GetMapping("/rentals-count")
+    public ResponseEntity<Map<String, String>> numberOfRentals(
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String weekday) {
 
+        Map<String, String> response = new HashMap<>();
 
+        try {
+            // Call the service layer to get the stats
+            int count = filmService.numberOfRentals(age, month, province, weekday);
+            response.put("count", String.valueOf(count));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "Error fetching stats");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
