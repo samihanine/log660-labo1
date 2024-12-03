@@ -40,6 +40,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -206,5 +207,22 @@ public class FilmController {
             response.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+    @GetMapping("/recommendations/{id}")
+    public ResponseEntity<Map<String, Object>> getRecommendations(@PathVariable int id, Authentication authentication) {
+        List<Film> films = filmService.getRecommendations(id, authentication.getName());
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("films", films.stream().map(film -> FilmDto.builder()
+                .id(film.getId())
+                .title(film.getTitle())
+                .year(film.getYear())
+                .build()).collect(Collectors.toSet()));
+
+        response.put("rating", filmService.getRating(id));
+
+        return ResponseEntity
+                .ok(response);
     }
 }

@@ -301,6 +301,55 @@ class DefaultFilmRepository implements FilmRepository {
         }
     }
 
+
+    @Override
+    public List<Film> getRecommendations(int id, User currentUser) {
+        try (Session session = getSession()) {
+            // Start building the SQL query
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT f.* FROM FILM f  JOIN LOCAL_FILMCORRELATIONS l ");
+            sqlBuilder.append("ON (l.idfilm1 = f.id_film AND l.idfilm2 = :filmId) OR (l.idfilm2 = f.id_film AND l.idfilm1 = :filmId) ");
+            sqlBuilder.append(" WHERE NOT EXISTS (SELECT 1 FROM COPIEFILM c JOIN RESERVATION r ON c.numero_de_code = r.copiefilm_numero_de_code ");
+            sqlBuilder.append(" WHERE c.film_id = f.id_film AND r.client_id = :userId ) ");
+            sqlBuilder.append("ORDER BY correlation DESC FETCH FIRST 3 ROWS ONLY ");
+
+            // Create the native query
+            Query query = session.createNativeQuery(sqlBuilder.toString(), Film.class);
+
+            // Set parameters
+            query.setParameter("userId", currentUser.getId());
+            query.setParameter("filmId", id);
+
+            // Execute the query and return the results
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    @Override
+    public double getRating(int idFilm) {
+        try (Session session = getSession()) {
+            // Start building the SQL query
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT m.COTE FROM V_LOCAL_MOY_COTE_FILM m  ");
+            sqlBuilder.append(" WHERE m.IDFILM = :filmId ");
+
+            // Create the native query
+            Query query = session.createNativeQuery(sqlBuilder.toString(), Double.class);
+
+            // Set parameters
+            query.setParameter("filmId", idFilm);
+
+            // Execute the query and return the results
+            return (double) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     private Query createQuery(Session session, String title, String genre, String actor, String director, String language,
                               String country, int startYear, int endYear, boolean isCount) {
 

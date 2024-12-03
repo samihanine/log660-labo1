@@ -34,6 +34,7 @@ import ca.etsmtl.log660.labo2.repository.film.FilmRepository;
 import ca.etsmtl.log660.labo2.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -97,5 +98,17 @@ class DefaultFilmService implements FilmService {
     @Override
     public int numberOfRentals(Integer age, String month, String province, String weekday) {
         return filmRepository.getNumberOfRentals(age, month, province, weekday);
+    }
+
+
+    @Override
+    public List<Film> getRecommendations(int id, String userEmail) {
+        User currentUser = userRepository.findByEmail(userEmail);
+        return filmRepository.getRecommendations(id, currentUser);
+    }
+
+    @Override
+    public double getRating(int idFilm) {
+        return filmRepository.getRating(idFilm);
     }
 }

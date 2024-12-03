@@ -31,6 +31,7 @@ package ca.etsmtl.log660.labo2.service;
 
 import ca.etsmtl.log660.labo2.models.Film;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -52,4 +53,8 @@ public interface FilmService {
     void generateFakeRents();
 
     int numberOfRentals(Integer age, String month, String province, String weekday);
+
+    List<Film> getRecommendations(int id, String userEmail);
+
+    double getRating(int idFilm);
 }
